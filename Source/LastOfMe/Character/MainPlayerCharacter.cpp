@@ -7,7 +7,8 @@
 #include "EnhancedInputComponent.h"
 #include "GameFramework/SpringArmComponent.h"
 #include "Camera/CameraComponent.h"
-#include "../LOMInputComponent.h"
+#include "../Component/LOMInputComponent.h"
+
 
 AMainPlayerCharacter::AMainPlayerCharacter()
 {
