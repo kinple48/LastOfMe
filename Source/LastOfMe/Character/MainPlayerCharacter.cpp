@@ -37,6 +37,24 @@ AMainPlayerCharacter::AMainPlayerCharacter()
 	//}
 }
 
+void AMainPlayerCharacter::BeginPlay()
+{
+	Super::BeginPlay();
+
+	auto* pc = Cast<APlayerController>(Controller);
+	if (pc)
+	{
+		auto subsystem = ULocalPlayer::GetSubsystem<UEnhancedInputLocalPlayerSubsystem>(pc->GetLocalPlayer());
+		
+		if (subsystem)
+		{
+			subsystem->AddMappingContext(MyInputCoponent->IMC_Player, 0);
+		}
+	}
+
+
+}
+
 void AMainPlayerCharacter::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
@@ -52,9 +70,9 @@ void AMainPlayerCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInpu
 
 	if (IsValid(EnhancedInputComponent))
 	{
-		EnhancedInputComponent->BindAction(MyInputCoponent->MoveAction, ETriggerEvent::Started, this, &AMainPlayerCharacter::Move);
-		EnhancedInputComponent->BindAction(MyInputCoponent->LookAction, ETriggerEvent::Started, this, &AMainPlayerCharacter::Look);
-		EnhancedInputComponent->BindAction(MyInputCoponent->WalkAction, ETriggerEvent::Started, this, &AMainPlayerCharacter::Walk);
+		EnhancedInputComponent->BindAction(MyInputCoponent->IA_Move, ETriggerEvent::Triggered, this, &AMainPlayerCharacter::Move);
+		EnhancedInputComponent->BindAction(MyInputCoponent->IA_Look, ETriggerEvent::Triggered, this, &AMainPlayerCharacter::Look);
+		EnhancedInputComponent->BindAction(MyInputCoponent->IA_Walk, ETriggerEvent::Started  , this, &AMainPlayerCharacter::Walk);
 
 	}
 }
