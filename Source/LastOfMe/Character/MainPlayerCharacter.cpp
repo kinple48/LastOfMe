@@ -37,6 +37,24 @@ AMainPlayerCharacter::AMainPlayerCharacter()
 	//}
 }
 
+void AMainPlayerCharacter::BeginPlay()
+{
+	Super::BeginPlay();
+
+	auto* pc = Cast<APlayerController>(Controller);
+	if (pc)
+	{
+		auto subsystem = ULocalPlayer::GetSubsystem<UEnhancedInputLocalPlayerSubsystem>(pc->GetLocalPlayer());
+		
+		if (subsystem)
+		{
+			subsystem->AddMappingContext(MyInputCoponent->IMC_Player, 0);
+		}
+	}
+
+
+}
+
 void AMainPlayerCharacter::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
@@ -52,16 +70,20 @@ void AMainPlayerCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInpu
 
 	if (IsValid(EnhancedInputComponent))
 	{
-		EnhancedInputComponent->BindAction(MyInputCoponent->MoveAction, ETriggerEvent::Started, this, &AMainPlayerCharacter::Move);
-		EnhancedInputComponent->BindAction(MyInputCoponent->LookAction, ETriggerEvent::Started, this, &AMainPlayerCharacter::Look);
-		EnhancedInputComponent->BindAction(MyInputCoponent->WalkAction, ETriggerEvent::Started, this, &AMainPlayerCharacter::Walk);
-
+		EnhancedInputComponent->BindAction(MyInputCoponent->IA_Move  , ETriggerEvent::Triggered, this, &AMainPlayerCharacter::Move  );
+		EnhancedInputComponent->BindAction(MyInputCoponent->IA_LookUp, ETriggerEvent::Triggered, this, &AMainPlayerCharacter::LookUp);
+		EnhancedInputComponent->BindAction(MyInputCoponent->IA_Turn  , ETriggerEvent::Triggered, this, &AMainPlayerCharacter::Turn  );
 	}
 }
 
-void AMainPlayerCharacter::Move(const FInputActionValue& Value)
+void AMainPlayerCharacter::Move(const FInputActionValue& inputValue)
 {
-	FVector2D MovementVector = Value.Get<FVector2D>();
+	FVector2D MovementVector = inputValue.Get<FVector2D>();
+
+	/*Direction.X = MovementVector.X;
+	Direction.Y = MovementVector.Y;*/
+
+
 
 	if (Controller != nullptr)
 	{
@@ -72,24 +94,28 @@ void AMainPlayerCharacter::Move(const FInputActionValue& Value)
 		const FVector ForwardDirection = FRotationMatrix(YawRotation).GetUnitAxis(EAxis::X);
 		const FVector   RightDirection = FRotationMatrix(YawRotation).GetUnitAxis(EAxis::Y);
 
-		AddMovementInput(ForwardDirection, MovementVector.Y);
-		AddMovementInput(  RightDirection, MovementVector.X);
-
+		AddMovementInput(ForwardDirection, MovementVector.X);
+		AddMovementInput(RightDirection  , MovementVector.Y);
 	}
 }
 
-void AMainPlayerCharacter::Look(const FInputActionValue& Value)
+void AMainPlayerCharacter::LookUp(const FInputActionValue& inputValue)
 {
-	FVector2D LookAxisVector = Value.Get<FVector2D>();
-
-	if (Controller != nullptr)
-	{
-		AddControllerYawInput  (LookAxisVector.X);
-		AddControllerPitchInput(LookAxisVector.Y);
-	}
+	float value = inputValue.Get<float>();
+	AddControllerPitchInput(value);
 }
 
-void AMainPlayerCharacter::Walk(const FInputActionValue& Value)
+void AMainPlayerCharacter::Turn(const FInputActionValue& inputValue)
 {
-	
+	float value = inputValue.Get<float>();
+	AddControllerYawInput(value);
 }
+
+void AMainPlayerCharacter::Sprint(const FInputActionValue& inputValue)
+{
+}
+
+void AMainPlayerCharacter::Attack(const FInputActionValue& inputValue)
+{
+}
+
