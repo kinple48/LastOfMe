@@ -29,9 +29,13 @@ public:
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
 	
 protected:
-	void Move(const FInputActionValue& Value);
-	void Look(const FInputActionValue& Value);
-	void Walk(const FInputActionValue& Value);
+	void Move(const FInputActionValue&   inputValue);
+	void LookUp(const FInputActionValue& inputValue);
+	void Turn(const FInputActionValue&   inputValue);
+	void Sprint(const FInputActionValue& inputValue);
+	void Attack(const FInputActionValue& inputValue);
+
+
 
 protected:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Component")
@@ -43,5 +47,7 @@ protected:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Camera")
 	class USpringArmComponent* springArm;
 
+	FVector Direction;
 
 };
+
