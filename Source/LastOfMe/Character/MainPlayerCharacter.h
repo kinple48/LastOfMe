@@ -50,3 +50,4 @@ protected:
 	FVector Direction;
 
 };
+

@@ -43,3 +43,4 @@ public:
 	class UInputAction* IA_Attack;
 
 };
+
