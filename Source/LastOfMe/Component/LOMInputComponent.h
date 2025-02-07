@@ -24,16 +24,22 @@ public:
 	// Called every frame
 	virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
 
-	UPROPERTY(BlueprintReadWrite, EditAnywhere)
-	class UInputMappingContext* MappingContext;
+	UPROPERTY(EditDefaultsOnly, Category = "Input")
+	class UInputMappingContext* IMC_Player;
 
-	UPROPERTY(BlueprintReadWrite, EditAnywhere)
-	class UInputAction* MoveAction;
+	UPROPERTY(EditDefaultsOnly, Category = "Input")
+	class UInputAction* IA_Move;
 
-	UPROPERTY(BlueprintReadWrite, EditAnywhere)
-	class UInputAction* LookAction;
+	UPROPERTY(EditDefaultsOnly, Category = "Input")
+	class UInputAction* IA_LookUp;
 
-	UPROPERTY(BlueprintReadWrite, EditAnywhere)
-	class UInputAction* WalkAction;
+	UPROPERTY(EditDefaultsOnly, Category = "Input")
+	class UInputAction* IA_Turn;
+
+	UPROPERTY(EditDefaultsOnly, Category = "Input")
+	class UInputAction* IA_Sprint;
+
+	UPROPERTY(EditDefaultsOnly, Category = "Input")
+	class UInputAction* IA_Attack;
 
 };
