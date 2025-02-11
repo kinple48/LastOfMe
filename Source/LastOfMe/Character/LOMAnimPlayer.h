@@ -32,4 +32,5 @@ protected:
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	class AMainPlayerCharacter* Player = nullptr;
+
 };

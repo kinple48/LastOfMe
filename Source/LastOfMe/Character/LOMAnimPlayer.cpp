@@ -24,4 +24,9 @@ void ULOMAnimPlayer::NativeUpdateAnimation(float DeltaSeconds)
 		return;
 	
 	Speed = Player->GetVelocity().Size2D();
+
+	FRotator BaseRotator = Player->GetActorRotation();
+
+	Direction = CalculateDirection(Velocity, BaseRotator);
+
 }
