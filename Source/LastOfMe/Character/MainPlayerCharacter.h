@@ -28,12 +28,21 @@ public:
 	// Called to bind functionality to input
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
 	
+public:
+	bool GetIsCrouched() { return bIsCrouched; }
+
+
 protected:
-	void Move(const FInputActionValue&   inputValue);
-	void LookUp(const FInputActionValue& inputValue);
-	void Turn(const FInputActionValue&   inputValue);
-	void Sprint(const FInputActionValue& inputValue);
-	void Attack(const FInputActionValue& inputValue);
+	void LookUp     (const FInputActionValue& inputValue);
+	void Turn       (const FInputActionValue& inputValue);
+	void Move       (const FInputActionValue& inputValue);
+	void SlowMove   (const FInputActionValue& inputValue);
+	void SprintStart(const FInputActionValue& inputValue);
+	void SprintEnd  (const FInputActionValue& inputValue);
+	//void Crouch     (const FInputActionValue& inputValue);
+	void Attack     (const FInputActionValue& inputValue);
+	void TEST       (const FInputActionValue& inputValue);
+
 
 
 
@@ -46,8 +55,10 @@ protected:
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Camera")
 	class USpringArmComponent* springArm;
-
-	FVector Direction;
+	
+protected:
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	class UStateComponent* stateComponent;
 
 };
 

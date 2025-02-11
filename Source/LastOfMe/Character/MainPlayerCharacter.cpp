@@ -8,6 +8,8 @@
 #include "GameFramework/SpringArmComponent.h"
 #include "Camera/CameraComponent.h"
 #include "../Component/LOMInputComponent.h"
+#include "../Component/StateComponent.h"
+#include "GameFramework/CharacterMovementComponent.h"
 
 
 AMainPlayerCharacter::AMainPlayerCharacter()
@@ -22,19 +24,17 @@ AMainPlayerCharacter::AMainPlayerCharacter()
 
 	MyInputCoponent = CreateDefaultSubobject<ULOMInputComponent>(TEXT("MyInputComponent"));
 
-	// 캐릭터 메시 넣어주기 
-	//ConstructorHelpers::FObjectFinder<USkeletalMesh> TempMesh(TEXT("/ Script / Engine.SkeletalMesh'/Game/Characters/Mannequin_UE4/Meshes/SK_Mannequin.SK_Mannequin'"));
-	//
-	//// 만약 파일읽기가 성공했다면
-	//
-	//if (TempMesh.Succeeded())
-	//{
-	//	//로드한 메시를 넣어주고 싶다.
-	//	GetMesh()->SetSkeletalMesh(TempMesh.Object);
-	//
-	//	// 위치값과 회전값을 반영해주고 싶다.
-	//	GetMesh()->SetRelativeLocationAndRotation(FVector(0.0f, 0.0f, -90.0f), FRotator(0.0f, -90.0f, 0.0f));
-	//}
+	
+	ConstructorHelpers::FObjectFinder<USkeletalMesh> TempMesh(TEXT("/Script/Engine.SkeletalMesh'/Game/Survival_Character/Meshes/SK_Survival_Character.SK_Survival_Character'"));
+	
+	// 만약 파일읽기가 성공했다면
+	
+	if (TempMesh.Succeeded())
+	{
+		GetMesh()->SetSkeletalMesh(TempMesh.Object);
+		
+		GetMesh()->SetRelativeLocationAndRotation(FVector(0.0f, 0.0f, -90.0f), FRotator(0.0f, -90.0f, 0.0f));
+	}
 }
 
 void AMainPlayerCharacter::BeginPlay()
@@ -70,32 +70,17 @@ void AMainPlayerCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInpu
 
 	if (IsValid(EnhancedInputComponent))
 	{
-		EnhancedInputComponent->BindAction(MyInputCoponent->IA_Move  , ETriggerEvent::Triggered, this, &AMainPlayerCharacter::Move  );
-		EnhancedInputComponent->BindAction(MyInputCoponent->IA_LookUp, ETriggerEvent::Triggered, this, &AMainPlayerCharacter::LookUp);
-		EnhancedInputComponent->BindAction(MyInputCoponent->IA_Turn  , ETriggerEvent::Triggered, this, &AMainPlayerCharacter::Turn  );
-	}
-}
-
-void AMainPlayerCharacter::Move(const FInputActionValue& inputValue)
-{
-	FVector2D MovementVector = inputValue.Get<FVector2D>();
-
-	/*Direction.X = MovementVector.X;
-	Direction.Y = MovementVector.Y;*/
+		EnhancedInputComponent->BindAction(MyInputCoponent->IA_LookUp  , ETriggerEvent::Triggered, this, &AMainPlayerCharacter::LookUp     );
+		EnhancedInputComponent->BindAction(MyInputCoponent->IA_Turn    , ETriggerEvent::Triggered, this, &AMainPlayerCharacter::Turn       );
+		EnhancedInputComponent->BindAction(MyInputCoponent->IA_Move    , ETriggerEvent::Triggered, this, &AMainPlayerCharacter::Move       );
+		EnhancedInputComponent->BindAction(MyInputCoponent->IA_SlowMove, ETriggerEvent::Started  , this, &AMainPlayerCharacter::SlowMove   );
+		EnhancedInputComponent->BindAction(MyInputCoponent->IA_Sprint  , ETriggerEvent::Ongoing  , this, &AMainPlayerCharacter::SprintStart);
+		EnhancedInputComponent->BindAction(MyInputCoponent->IA_Sprint  , ETriggerEvent::Completed, this, &AMainPlayerCharacter::SprintEnd  );
+		//EnhancedInputComponent->BindAction(MyInputCoponent->IA_Crouch  , ETriggerEvent::Started  , this, &AMainPlayerCharacter::Crouch     );
 
 
+		EnhancedInputComponent->BindAction(MyInputCoponent->IA_TEST    , ETriggerEvent::Triggered, this, &AMainPlayerCharacter::TEST);
 
-	if (Controller != nullptr)
-	{
-		const FRotator Rotation = Controller->GetControlRotation();
-
-		const FRotator YawRotation(0, Rotation.Yaw, 0);
-
-		const FVector ForwardDirection = FRotationMatrix(YawRotation).GetUnitAxis(EAxis::X);
-		const FVector   RightDirection = FRotationMatrix(YawRotation).GetUnitAxis(EAxis::Y);
-
-		AddMovementInput(ForwardDirection, MovementVector.X);
-		AddMovementInput(RightDirection  , MovementVector.Y);
 	}
 }
 
@@ -111,11 +96,59 @@ void AMainPlayerCharacter::Turn(const FInputActionValue& inputValue)
 	AddControllerYawInput(value);
 }
 
-void AMainPlayerCharacter::Sprint(const FInputActionValue& inputValue)
+void AMainPlayerCharacter::Move(const FInputActionValue& inputValue)
 {
+	FVector2D MovementVector = inputValue.Get<FVector2D>();
+
+	/*Direction.X = MovementVector.X;
+	Direction.Y = MovementVector.Y;*/
+
+	if (Controller != nullptr)
+	{
+		const FRotator Rotation = Controller->GetControlRotation();
+
+		const FRotator YawRotation(0, Rotation.Yaw, 0);
+
+		const FVector ForwardDirection = FRotationMatrix(YawRotation).GetUnitAxis(EAxis::X);
+		const FVector   RightDirection = FRotationMatrix(YawRotation).GetUnitAxis(EAxis::Y);
+
+		AddMovementInput(ForwardDirection, MovementVector.X);
+		AddMovementInput(RightDirection  , MovementVector.Y);
+	}
+
 }
+
+void AMainPlayerCharacter::SlowMove(const FInputActionValue& inputValue)
+{
+
+
+	
+}
+
+void AMainPlayerCharacter::SprintStart(const FInputActionValue& inputValue)
+{
+	//GetCharacterMovement()->GetMaxSpeed() = 800.0f;
+}
+
+void AMainPlayerCharacter::SprintEnd(const FInputActionValue& inputValue)
+{
+	//GetCharacterMovement()->GetMaxSpeed() = 400.0f;
+
+}
+
+//void AMainPlayerCharacter::Crouch(const FInputActionValue& inputValue)
+//{
+//	
+//}
 
 void AMainPlayerCharacter::Attack(const FInputActionValue& inputValue)
 {
+}
+
+void AMainPlayerCharacter::TEST(const FInputActionValue& inputValue)
+{
+	MakeNoise(0.5f, this, GetActorLocation(), 1000.f, TEXT("enemysound"));
+
+	GEngine->AddOnScreenDebugMessage(-1, 3.0f, FColor::Blue, TEXT("enemysound!!!!!"));
 }
 
