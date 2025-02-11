@@ -76,7 +76,8 @@ void AMainPlayerCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInpu
 		EnhancedInputComponent->BindAction(MyInputCoponent->IA_SlowMove, ETriggerEvent::Started  , this, &AMainPlayerCharacter::SlowMove   );
 		EnhancedInputComponent->BindAction(MyInputCoponent->IA_Sprint  , ETriggerEvent::Ongoing  , this, &AMainPlayerCharacter::SprintStart);
 		EnhancedInputComponent->BindAction(MyInputCoponent->IA_Sprint  , ETriggerEvent::Completed, this, &AMainPlayerCharacter::SprintEnd  );
-		//EnhancedInputComponent->BindAction(MyInputCoponent->IA_Crouch  , ETriggerEvent::Started  , this, &AMainPlayerCharacter::Crouch     );
+		EnhancedInputComponent->BindAction(MyInputCoponent->IA_Crouch  , ETriggerEvent::Started  , this, &AMainPlayerCharacter::CrouchStart);
+		EnhancedInputComponent->BindAction(MyInputCoponent->IA_Crouch  , ETriggerEvent::Started  , this, &AMainPlayerCharacter::CrouchEnd  );
 
 
 		EnhancedInputComponent->BindAction(MyInputCoponent->IA_TEST    , ETriggerEvent::Triggered, this, &AMainPlayerCharacter::TEST);
@@ -136,10 +137,20 @@ void AMainPlayerCharacter::SprintEnd(const FInputActionValue& inputValue)
 
 }
 
-//void AMainPlayerCharacter::Crouch(const FInputActionValue& inputValue)
-//{
-//	
-//}
+void AMainPlayerCharacter::CrouchStart(const FInputActionValue& inputValue)
+{
+	GetMovementComponent()->GetNavAgentPropertiesRef().bCanCrouch = true;
+
+	GEngine->AddOnScreenDebugMessage(-1, 3.0f, FColor::Blue, TEXT("Crouch!!!!!"));
+
+}
+
+void AMainPlayerCharacter::CrouchEnd(const FInputActionValue& inputValue)
+{
+	GetMovementComponent()->GetNavAgentPropertiesRef().bCanCrouch = false;
+	GEngine->AddOnScreenDebugMessage(-1, 3.0f, FColor::Blue, TEXT("CrouchEnd!!!!!"));
+
+}
 
 void AMainPlayerCharacter::Attack(const FInputActionValue& inputValue)
 {

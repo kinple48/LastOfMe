@@ -39,7 +39,8 @@ protected:
 	void SlowMove   (const FInputActionValue& inputValue);
 	void SprintStart(const FInputActionValue& inputValue);
 	void SprintEnd  (const FInputActionValue& inputValue);
-	//void Crouch     (const FInputActionValue& inputValue);
+	void CrouchStart(const FInputActionValue& inputValue);
+	void CrouchEnd  (const FInputActionValue& inputValue);
 	void Attack     (const FInputActionValue& inputValue);
 	void TEST       (const FInputActionValue& inputValue);
 
