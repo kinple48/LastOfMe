@@ -82,8 +82,6 @@ void UEnemyFSM::AttackState()
 	CurrentTime += GetWorld()->GetDeltaSeconds();
 	if (CurrentTime >= BiteTime)
 	{
-		GEngine->AddOnScreenDebugMessage(-1, 3.0f, FColor::Black, TEXT("Bite"));
-		attackstate = false;
 		mState = EEnemyState::Bite;
 		CurrentTime = 0.f;
 	}
@@ -108,6 +106,8 @@ void UEnemyFSM::DieState()
 
 void UEnemyFSM::BiteState()
 {
+	GEngine->AddOnScreenDebugMessage(-1, 3.0f, FColor::Black, TEXT("Bite"));
 	bitestate = true;
+	mState = EEnemyState::Idle;
 }
 
