@@ -23,7 +23,8 @@ AMainPlayerCharacter::AMainPlayerCharacter()
 	playerCam->SetupAttachment(springArm);
 
 	MyInputCoponent = CreateDefaultSubobject<ULOMInputComponent>(TEXT("MyInputComponent"));
-
+	StateComponent = CreateDefaultSubobject<UStateComponent>(TEXT("StateComponent"));
+	
 	
 	ConstructorHelpers::FObjectFinder<USkeletalMesh> TempMesh(TEXT("/Script/Engine.SkeletalMesh'/Game/Survival_Character/Meshes/SK_Survival_Character.SK_Survival_Character'"));
 	
@@ -118,13 +119,13 @@ void AMainPlayerCharacter::Move(const FInputActionValue& inputValue)
 
 void AMainPlayerCharacter::SlowMove(const FInputActionValue& inputValue)
 {
-	stateComponent->bIsWalking = ! stateComponent->bIsWalking;
+	StateComponent->bIsWalking = !StateComponent->bIsWalking;
 
 	float Speed = GetVelocity().Size();
 
-	if (Speed > 200.0f || stateComponent->bIsWalking)
+	if (Speed > 200.0f || StateComponent->bIsWalking)
 	{
-		GetCharacterMovement()->MaxWalkSpeed = 400.0f; 
+		GetCharacterMovement()->MaxWalkSpeed = 100.0f; 
 	}
 	else
 	{
@@ -132,18 +133,18 @@ void AMainPlayerCharacter::SlowMove(const FInputActionValue& inputValue)
 	}
 }
 
-void AMainPlayerCharacter::SprintStart(const FInputActionValue& inputValue)
+void AMainPlayerCharacter::SprintStart()
 {
-	stateComponent->bIsWalking = false;
+	StateComponent->bIsWalking = false;
 
-	GetCharacterMovement()->MaxWalkSpeed = 800.0f;
+	//bIsWalking = false;
+
+	GetCharacterMovement()->MaxWalkSpeed = 2000.0f;
 
 }
 
-void AMainPlayerCharacter::SprintEnd(const FInputActionValue& inputValue)
+void AMainPlayerCharacter::SprintEnd()
 {
-	stateComponent->bIsWalking = true;
-
 	GetCharacterMovement()->MaxWalkSpeed = 600.0f;
 }
 
@@ -151,7 +152,6 @@ void AMainPlayerCharacter::CrouchStart(const FInputActionValue& inputValue)
 {
 	GetMovementComponent()->GetNavAgentPropertiesRef().bCanCrouch = true;
 	GEngine->AddOnScreenDebugMessage(-1, 3.0f, FColor::Blue, TEXT("Crouch!!!!!"));
-
 }
 
 void AMainPlayerCharacter::CrouchEnd(const FInputActionValue& inputValue)
