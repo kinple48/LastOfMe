@@ -28,19 +28,28 @@ public:
 	class UInputMappingContext* IMC_Player;
 
 	UPROPERTY(EditDefaultsOnly, Category = "Input")
-	class UInputAction* IA_Move;
-
-	UPROPERTY(EditDefaultsOnly, Category = "Input")
 	class UInputAction* IA_LookUp;
 
 	UPROPERTY(EditDefaultsOnly, Category = "Input")
 	class UInputAction* IA_Turn;
 
 	UPROPERTY(EditDefaultsOnly, Category = "Input")
+	class UInputAction* IA_Move;
+
+	UPROPERTY(EditDefaultsOnly, Category = "Input")
+	class UInputAction* IA_SlowMove;
+
+	UPROPERTY(EditDefaultsOnly, Category = "Input")
 	class UInputAction* IA_Sprint;
 
 	UPROPERTY(EditDefaultsOnly, Category = "Input")
+	class UInputAction* IA_Crouch;
+
+	UPROPERTY(EditDefaultsOnly, Category = "Input")
 	class UInputAction* IA_Attack;
+
+	UPROPERTY(EditDefaultsOnly, Category = "Input")
+	class UInputAction* IA_TEST;
 
 };
 
