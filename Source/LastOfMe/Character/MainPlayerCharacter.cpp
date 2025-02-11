@@ -77,11 +77,8 @@ void AMainPlayerCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInpu
 		EnhancedInputComponent->BindAction(MyInputCoponent->IA_Sprint  , ETriggerEvent::Ongoing  , this, &AMainPlayerCharacter::SprintStart);
 		EnhancedInputComponent->BindAction(MyInputCoponent->IA_Sprint  , ETriggerEvent::Completed, this, &AMainPlayerCharacter::SprintEnd  );
 		EnhancedInputComponent->BindAction(MyInputCoponent->IA_Crouch  , ETriggerEvent::Started  , this, &AMainPlayerCharacter::CrouchStart);
-		EnhancedInputComponent->BindAction(MyInputCoponent->IA_Crouch  , ETriggerEvent::Started  , this, &AMainPlayerCharacter::CrouchEnd  );
-
 
 		EnhancedInputComponent->BindAction(MyInputCoponent->IA_TEST    , ETriggerEvent::Triggered, this, &AMainPlayerCharacter::TEST);
-
 	}
 }
 
@@ -121,39 +118,50 @@ void AMainPlayerCharacter::Move(const FInputActionValue& inputValue)
 
 void AMainPlayerCharacter::SlowMove(const FInputActionValue& inputValue)
 {
+	stateComponent->bIsWalking = ! stateComponent->bIsWalking;
 
+	float Speed = GetVelocity().Size();
 
-	
+	if (Speed > 200.0f || stateComponent->bIsWalking)
+	{
+		GetCharacterMovement()->MaxWalkSpeed = 400.0f; 
+	}
+	else
+	{
+		GetCharacterMovement()->MaxWalkSpeed = 600.0f;
+	}
 }
 
 void AMainPlayerCharacter::SprintStart(const FInputActionValue& inputValue)
 {
-	//GetCharacterMovement()->GetMaxSpeed() = 800.0f;
+	stateComponent->bIsWalking = false;
+
+	GetCharacterMovement()->MaxWalkSpeed = 800.0f;
+
 }
 
 void AMainPlayerCharacter::SprintEnd(const FInputActionValue& inputValue)
 {
-	//GetCharacterMovement()->GetMaxSpeed() = 400.0f;
+	stateComponent->bIsWalking = true;
 
+	GetCharacterMovement()->MaxWalkSpeed = 600.0f;
 }
 
 void AMainPlayerCharacter::CrouchStart(const FInputActionValue& inputValue)
 {
 	GetMovementComponent()->GetNavAgentPropertiesRef().bCanCrouch = true;
-
 	GEngine->AddOnScreenDebugMessage(-1, 3.0f, FColor::Blue, TEXT("Crouch!!!!!"));
 
 }
 
 void AMainPlayerCharacter::CrouchEnd(const FInputActionValue& inputValue)
 {
-	GetMovementComponent()->GetNavAgentPropertiesRef().bCanCrouch = false;
-	GEngine->AddOnScreenDebugMessage(-1, 3.0f, FColor::Blue, TEXT("CrouchEnd!!!!!"));
-
+	
 }
 
 void AMainPlayerCharacter::Attack(const FInputActionValue& inputValue)
 {
+
 }
 
 void AMainPlayerCharacter::TEST(const FInputActionValue& inputValue)
