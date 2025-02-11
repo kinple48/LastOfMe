@@ -13,7 +13,8 @@ enum class EEnemyState : uint8
 	Move UMETA(DisplayName = "이동"),
 	Attack UMETA(DisplayName = "공격"),
 	Damage UMETA(DisplayName = "데미지"),
-	Die UMETA(DisplayName = "죽음")
+	Die UMETA(DisplayName = "죽음"),
+	Bite UMETA(DisplayName = "물기")
 };
 
 UCLASS( ClassGroup=(Custom), meta=(BlueprintSpawnableComponent) )
@@ -52,6 +53,8 @@ public:
 
 	void DieState();
 
+	void BiteState();
+
 	UPROPERTY(EditAnywhere, Category = FSM)
 	float TraceRange = 500.0f;
 
@@ -60,4 +63,13 @@ public:
 
 	UPROPERTY(EditAnywhere,BlueprintReadWrite)
 	float speed = 0.f;
+
+	UPROPERTY(EditAnywhere,BlueprintReadWrite)
+	bool attackstate = false;
+
+	UPROPERTY(EditAnywhere,BlueprintReadWrite)
+	bool bitestate = false;
+
+	float CurrentTime = 0.f;
+	float BiteTime = 5.0f;
 };

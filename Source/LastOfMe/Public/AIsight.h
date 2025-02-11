@@ -10,7 +10,8 @@ UENUM()
 enum class enemyAISense
 {
 	Sight UMETA(DisplayName = "시야감지"),
-	Damage UMETA(DisplayName = "피격감지")
+	Damage UMETA(DisplayName = "피격감지"),
+	Hearing UMETA(DisplayName = "소리감지")
 };
 
 
@@ -29,6 +30,9 @@ public:
 
 	UPROPERTY(EditDefaultsOnly,BlueprintReadOnly)
 	class UAISenseConfig_Damage* Damageconfig;
+
+	UPROPERTY(EditDefaultsOnly,BlueprintReadOnly)
+	class UAISenseConfig_Hearing* HearingConfig;
 
 	UFUNCTION()
 	void PerceptionUpdated(const TArray<AActor*>& UpdatedActors);

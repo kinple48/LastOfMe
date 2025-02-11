@@ -30,4 +30,7 @@ public:
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = FSMComponent)
 	class UEnemyFSM* FSM;
+
+	float CurrentTime = 0.f;
+	float NoiseTime = 10.f;
 };

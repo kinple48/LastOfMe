@@ -40,7 +40,7 @@ void UEnemyFSM::TickComponent(float DeltaTime, ELevelTick TickType, FActorCompon
 	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
 
 	FString logMsg = UEnum::GetValueAsString(mState);
-	GEngine->AddOnScreenDebugMessage(0, 1.0f, FColor::Red, logMsg);
+	//GEngine->AddOnScreenDebugMessage(0, 1.0f, FColor::Red, logMsg);
 
 	switch (mState)
 	{
@@ -49,6 +49,7 @@ void UEnemyFSM::TickComponent(float DeltaTime, ELevelTick TickType, FActorCompon
 	case EEnemyState::Attack: { AttackState();} break;
 	case EEnemyState::Damage: { DamageState(); } break;
 	case EEnemyState::Die: { DieState(); } break;
+	case EEnemyState::Bite: { BiteState(); } break;
 	}
 
 }
@@ -62,8 +63,7 @@ void UEnemyFSM::MoveState()
 	if (!target || !me) return;
 	FVector destination = target->GetActorLocation();
 	FVector dir = destination - me->GetActorLocation();
-	speed = 2.0f;
-	me->SetActorLocationAndRotation(FVector(me->GetActorLocation() + speed * dir * GetWorld()->DeltaTimeSeconds),FRotator(UKismetMathLibrary::MakeRotFromXZ(dir,me->GetActorUpVector())));
+	me->AddMovementInput(dir);
 
 	if (dir.Size() <= AttackRange)
 	{
@@ -75,10 +75,24 @@ void UEnemyFSM::MoveState()
 void UEnemyFSM::AttackState()
 {
 	speed = 0.f;
+	attackstate = true;
+	FVector destination = target->GetActorLocation();
+	FVector dir = destination - me->GetActorLocation();
+	me->SetActorRotation(UKismetMathLibrary::MakeRotFromXZ(dir, me->GetActorUpVector()));
+	CurrentTime += GetWorld()->GetDeltaSeconds();
+	if (CurrentTime >= BiteTime)
+	{
+		GEngine->AddOnScreenDebugMessage(-1, 3.0f, FColor::Black, TEXT("Bite"));
+		attackstate = false;
+		mState = EEnemyState::Bite;
+		CurrentTime = 0.f;
+	}
+
 	float distance = FVector::Dist(me->GetActorLocation(), target->GetActorLocation());
 	if (distance > AttackRange)
 	{
 		mState = EEnemyState::Move;
+		attackstate = false;
 	}
 }
 
@@ -90,5 +104,10 @@ void UEnemyFSM::DamageState()
 void UEnemyFSM::DieState()
 {
 
+}
+
+void UEnemyFSM::BiteState()
+{
+	bitestate = true;
 }
 
