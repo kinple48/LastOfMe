@@ -53,18 +53,18 @@ protected:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Component")
 	class ULOMInputComponent* MyInputCoponent;
 
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Component")
+	class UStateComponent* StateComponent;
+
+
+protected:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Camera")
 	class UCameraComponent* playerCam;
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Camera")
 	class USpringArmComponent* springArm;
 	
-protected:
 
-public:
-	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	class UStateComponent* StateComponent;
-
-	bool bIsWalking = false; 
+	
 };
 

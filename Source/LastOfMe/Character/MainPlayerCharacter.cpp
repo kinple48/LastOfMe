@@ -36,6 +36,8 @@ AMainPlayerCharacter::AMainPlayerCharacter()
 		
 		GetMesh()->SetRelativeLocationAndRotation(FVector(0.0f, 0.0f, -90.0f), FRotator(0.0f, -90.0f, 0.0f));
 	}
+
+	GetCharacterMovement()->NavAgentProps.bCanCrouch = true;
 }
 
 void AMainPlayerCharacter::BeginPlay()
@@ -53,6 +55,7 @@ void AMainPlayerCharacter::BeginPlay()
 		}
 	}
 
+	GetCharacterMovement()->MaxWalkSpeed = StateComponent->RunSpeed;
 
 }
 
@@ -125,11 +128,11 @@ void AMainPlayerCharacter::SlowMove(const FInputActionValue& inputValue)
 
 	if (Speed > 200.0f || StateComponent->bIsWalking)
 	{
-		GetCharacterMovement()->MaxWalkSpeed = 100.0f; 
+		GetCharacterMovement()->MaxWalkSpeed = StateComponent->WalkSpeed;
 	}
 	else
 	{
-		GetCharacterMovement()->MaxWalkSpeed = 600.0f;
+		GetCharacterMovement()->MaxWalkSpeed = StateComponent->RunSpeed;
 	}
 }
 
@@ -139,19 +142,27 @@ void AMainPlayerCharacter::SprintStart()
 
 	//bIsWalking = false;
 
-	GetCharacterMovement()->MaxWalkSpeed = 2000.0f;
+	GetCharacterMovement()->MaxWalkSpeed = StateComponent->SprintSpeed;
 
 }
 
 void AMainPlayerCharacter::SprintEnd()
 {
-	GetCharacterMovement()->MaxWalkSpeed = 600.0f;
+	GetCharacterMovement()->MaxWalkSpeed = StateComponent->RunSpeed;
 }
 
 void AMainPlayerCharacter::CrouchStart(const FInputActionValue& inputValue)
 {
-	GetMovementComponent()->GetNavAgentPropertiesRef().bCanCrouch = true;
-	GEngine->AddOnScreenDebugMessage(-1, 3.0f, FColor::Blue, TEXT("Crouch!!!!!"));
+	if (bIsCrouched)
+	{
+		UnCrouch();
+		GetCharacterMovement()->MaxWalkSpeed = StateComponent->RunSpeed;
+	}
+	else
+	{
+		Crouch();
+		GetCharacterMovement()->MaxWalkSpeed = StateComponent->CrouchSpeed;
+	}
 }
 
 void AMainPlayerCharacter::CrouchEnd(const FInputActionValue& inputValue)

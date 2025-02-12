@@ -28,9 +28,20 @@ protected:
 	float Direction = 0;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	FVector Velocity;
+	float CrouchDirection = 0;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	FVector velocity;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	FVector forwardVector;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	class AMainPlayerCharacter* Player = nullptr;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	bool bIsCrouched = false;
+
+	
 
 };

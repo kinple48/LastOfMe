@@ -25,13 +25,31 @@ public:
 	virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
 
 public:
-	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	
+	UStateComponent* SetIsWalking  (bool IsWalking)  { this->bIsWalking  = IsWalking;  return this; }
+	UStateComponent* SetIsSprint   (bool IsSprint)   { this->bIsSprint   = IsSprint;   return this; }
+	UStateComponent* SetIsCrouched (bool IsCrouched) { this->bIsCrouched = IsCrouched; return this; }
+
+public:
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "boolean")
 	bool bIsWalking = false;
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "boolean")
 	bool bIsSprint = false;
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "boolean")
 	bool bIsCrouched = false;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "MoveSpeed")
+	float CrouchSpeed = 250.0f;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "MoveSpeed")
+	float WalkSpeed = 400.0f;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "MoveSpeed")
+	float RunSpeed = 600.0f;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "MoveSpeed")
+	float SprintSpeed = 800.0f;
 		
 };
