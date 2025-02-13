@@ -4,6 +4,7 @@
 #include "LOMAnimPlayer.h"
 #include "MainPlayerCharacter.h"
 #include "GameFramework/CharacterMovementComponent.h"
+#include "../Component/StateComponent.h"
 
 ULOMAnimPlayer::ULOMAnimPlayer()
 {
@@ -23,10 +24,16 @@ void ULOMAnimPlayer::NativeUpdateAnimation(float DeltaSeconds)
 	if (Player == nullptr)
 		return;
 	
-	Speed = Player->GetVelocity().Size2D();
+	velocity = Player->GetVelocity();
+	forwardVector = Player->GetActorForwardVector();
 
+	Speed = FVector::DotProduct(forwardVector, velocity);
+
+	FVector rightVector = Player->GetActorRightVector();
+	Direction = FVector::DotProduct(rightVector, velocity);
+	
 	FRotator BaseRotator = Player->GetActorRotation();
+	CrouchDirection = CalculateDirection(velocity, BaseRotator);
 
-	Direction = CalculateDirection(Velocity, BaseRotator);
-
+	bIsCrouched = Player->bIsCrouched;	
 }

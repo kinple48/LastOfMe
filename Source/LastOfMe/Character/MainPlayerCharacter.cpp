@@ -23,7 +23,8 @@ AMainPlayerCharacter::AMainPlayerCharacter()
 	playerCam->SetupAttachment(springArm);
 
 	MyInputCoponent = CreateDefaultSubobject<ULOMInputComponent>(TEXT("MyInputComponent"));
-
+	StateComponent = CreateDefaultSubobject<UStateComponent>(TEXT("StateComponent"));
+	
 	
 	ConstructorHelpers::FObjectFinder<USkeletalMesh> TempMesh(TEXT("/Script/Engine.SkeletalMesh'/Game/Survival_Character/Meshes/SK_Survival_Character.SK_Survival_Character'"));
 	
@@ -35,6 +36,8 @@ AMainPlayerCharacter::AMainPlayerCharacter()
 		
 		GetMesh()->SetRelativeLocationAndRotation(FVector(0.0f, 0.0f, -90.0f), FRotator(0.0f, -90.0f, 0.0f));
 	}
+
+	GetCharacterMovement()->NavAgentProps.bCanCrouch = true;
 }
 
 void AMainPlayerCharacter::BeginPlay()
@@ -52,13 +55,14 @@ void AMainPlayerCharacter::BeginPlay()
 		}
 	}
 
-
+	GetCharacterMovement()->MaxWalkSpeed = StateComponent->RunSpeed;
 }
 
 void AMainPlayerCharacter::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
+	
 }
 
 void AMainPlayerCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
@@ -77,11 +81,8 @@ void AMainPlayerCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInpu
 		EnhancedInputComponent->BindAction(MyInputCoponent->IA_Sprint  , ETriggerEvent::Ongoing  , this, &AMainPlayerCharacter::SprintStart);
 		EnhancedInputComponent->BindAction(MyInputCoponent->IA_Sprint  , ETriggerEvent::Completed, this, &AMainPlayerCharacter::SprintEnd  );
 		EnhancedInputComponent->BindAction(MyInputCoponent->IA_Crouch  , ETriggerEvent::Started  , this, &AMainPlayerCharacter::CrouchStart);
-		EnhancedInputComponent->BindAction(MyInputCoponent->IA_Crouch  , ETriggerEvent::Started  , this, &AMainPlayerCharacter::CrouchEnd  );
-
 
 		EnhancedInputComponent->BindAction(MyInputCoponent->IA_TEST    , ETriggerEvent::Triggered, this, &AMainPlayerCharacter::TEST);
-
 	}
 }
 
@@ -121,45 +122,76 @@ void AMainPlayerCharacter::Move(const FInputActionValue& inputValue)
 
 void AMainPlayerCharacter::SlowMove(const FInputActionValue& inputValue)
 {
+	StateComponent->bIsWalking = !StateComponent->bIsWalking;
 
+	float Speed = GetVelocity().Size();
 
-	
+	if (Speed > 200.0f || StateComponent->bIsWalking)
+	{
+		GetCharacterMovement()->MaxWalkSpeed = StateComponent->WalkSpeed;
+		if (StateComponent->WalkSpeed)
+		{
+			MakeNoise(1.0f, this, GetActorLocation(), 1000.f, TEXT("enemysound"));
+			GEngine->AddOnScreenDebugMessage(-1, 3.0f, FColor::Blue, TEXT("WalkSpeed"));
+		}
+	}
+	else
+	{
+		GetCharacterMovement()->MaxWalkSpeed = StateComponent->RunSpeed;
+		if(StateComponent->RunSpeed)
+		{
+			MakeNoise(1.0f, this, GetActorLocation(), 1000.f, TEXT("enemysound"));
+			GEngine->AddOnScreenDebugMessage(-1, 3.0f, FColor::Blue, TEXT("RunSpeed"));
+		}
+	}
 }
 
-void AMainPlayerCharacter::SprintStart(const FInputActionValue& inputValue)
+void AMainPlayerCharacter::SprintStart()
 {
-	//GetCharacterMovement()->GetMaxSpeed() = 800.0f;
+	StateComponent->bIsWalking = false;
+
+	//bIsWalking = false;
+
+	GetCharacterMovement()->MaxWalkSpeed = StateComponent->SprintSpeed;
+	if (StateComponent->SprintSpeed)
+	{
+		MakeNoise(1.0f, this, GetActorLocation(), 1000.f, TEXT("enemysound"));
+		GEngine->AddOnScreenDebugMessage(-1, 3.0f, FColor::Blue, TEXT("SprintSpeed"));
+	}
 }
 
-void AMainPlayerCharacter::SprintEnd(const FInputActionValue& inputValue)
+void AMainPlayerCharacter::SprintEnd()
 {
-	//GetCharacterMovement()->GetMaxSpeed() = 400.0f;
-
+	GetCharacterMovement()->MaxWalkSpeed = StateComponent->RunSpeed;
 }
 
 void AMainPlayerCharacter::CrouchStart(const FInputActionValue& inputValue)
 {
-	GetMovementComponent()->GetNavAgentPropertiesRef().bCanCrouch = true;
-
-	GEngine->AddOnScreenDebugMessage(-1, 3.0f, FColor::Blue, TEXT("Crouch!!!!!"));
-
+	if (bIsCrouched)
+	{
+		UnCrouch();
+		GetCharacterMovement()->MaxWalkSpeed = StateComponent->RunSpeed;
+	}
+	else
+	{
+		Crouch();
+		GetCharacterMovement()->MaxWalkSpeed = StateComponent->CrouchSpeed;
+	}
 }
 
 void AMainPlayerCharacter::CrouchEnd(const FInputActionValue& inputValue)
 {
-	GetMovementComponent()->GetNavAgentPropertiesRef().bCanCrouch = false;
-	GEngine->AddOnScreenDebugMessage(-1, 3.0f, FColor::Blue, TEXT("CrouchEnd!!!!!"));
-
+	
 }
 
 void AMainPlayerCharacter::Attack(const FInputActionValue& inputValue)
 {
+
 }
 
 void AMainPlayerCharacter::TEST(const FInputActionValue& inputValue)
 {
-	MakeNoise(0.5f, this, GetActorLocation(), 1000.f, TEXT("enemysound"));
-
+	MakeNoise(1.0f, this, GetActorLocation(), 1000.f, TEXT("enemysound"));
 	GEngine->AddOnScreenDebugMessage(-1, 3.0f, FColor::Blue, TEXT("enemysound!!!!!"));
 }
 

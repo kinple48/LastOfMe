@@ -37,8 +37,10 @@ protected:
 	void Turn       (const FInputActionValue& inputValue);
 	void Move       (const FInputActionValue& inputValue);
 	void SlowMove   (const FInputActionValue& inputValue);
-	void SprintStart(const FInputActionValue& inputValue);
-	void SprintEnd  (const FInputActionValue& inputValue);
+
+	void SprintStart();
+	void SprintEnd  ();
+
 	void CrouchStart(const FInputActionValue& inputValue);
 	void CrouchEnd  (const FInputActionValue& inputValue);
 	void Attack     (const FInputActionValue& inputValue);
@@ -51,15 +53,16 @@ protected:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Component")
 	class ULOMInputComponent* MyInputCoponent;
 
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Component")
+	class UStateComponent* StateComponent;
+
+
+protected:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Camera")
 	class UCameraComponent* playerCam;
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Camera")
 	class USpringArmComponent* springArm;
-	
-protected:
-	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	class UStateComponent* stateComponent;
 
 };
 
