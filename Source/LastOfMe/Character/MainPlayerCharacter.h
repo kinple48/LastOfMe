@@ -63,8 +63,6 @@ protected:
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Camera")
 	class USpringArmComponent* springArm;
-	
 
-	
 };
 

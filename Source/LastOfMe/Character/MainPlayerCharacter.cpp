@@ -56,13 +56,13 @@ void AMainPlayerCharacter::BeginPlay()
 	}
 
 	GetCharacterMovement()->MaxWalkSpeed = StateComponent->RunSpeed;
-
 }
 
 void AMainPlayerCharacter::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
+	
 }
 
 void AMainPlayerCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
@@ -129,10 +129,20 @@ void AMainPlayerCharacter::SlowMove(const FInputActionValue& inputValue)
 	if (Speed > 200.0f || StateComponent->bIsWalking)
 	{
 		GetCharacterMovement()->MaxWalkSpeed = StateComponent->WalkSpeed;
+		if (StateComponent->WalkSpeed)
+		{
+			MakeNoise(1.0f, this, GetActorLocation(), 1000.f, TEXT("enemysound"));
+			GEngine->AddOnScreenDebugMessage(-1, 3.0f, FColor::Blue, TEXT("WalkSpeed"));
+		}
 	}
 	else
 	{
 		GetCharacterMovement()->MaxWalkSpeed = StateComponent->RunSpeed;
+		if(StateComponent->RunSpeed)
+		{
+			MakeNoise(1.0f, this, GetActorLocation(), 1000.f, TEXT("enemysound"));
+			GEngine->AddOnScreenDebugMessage(-1, 3.0f, FColor::Blue, TEXT("RunSpeed"));
+		}
 	}
 }
 
@@ -143,7 +153,11 @@ void AMainPlayerCharacter::SprintStart()
 	//bIsWalking = false;
 
 	GetCharacterMovement()->MaxWalkSpeed = StateComponent->SprintSpeed;
-
+	if (StateComponent->SprintSpeed)
+	{
+		MakeNoise(1.0f, this, GetActorLocation(), 1000.f, TEXT("enemysound"));
+		GEngine->AddOnScreenDebugMessage(-1, 3.0f, FColor::Blue, TEXT("SprintSpeed"));
+	}
 }
 
 void AMainPlayerCharacter::SprintEnd()
@@ -177,8 +191,7 @@ void AMainPlayerCharacter::Attack(const FInputActionValue& inputValue)
 
 void AMainPlayerCharacter::TEST(const FInputActionValue& inputValue)
 {
-	MakeNoise(0.5f, this, GetActorLocation(), 1000.f, TEXT("enemysound"));
-
+	MakeNoise(1.0f, this, GetActorLocation(), 1000.f, TEXT("enemysound"));
 	GEngine->AddOnScreenDebugMessage(-1, 3.0f, FColor::Blue, TEXT("enemysound!!!!!"));
 }
 
