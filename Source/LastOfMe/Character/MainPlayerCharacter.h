@@ -9,6 +9,12 @@
 /**
  * 
  */
+ UENUM(BlueprintType)
+	 enum class EActionState : uint8
+ {
+	 UNARMED, MELEE, BLUNT
+ };
+
 UCLASS()
 class LASTOFME_API AMainPlayerCharacter : public APlayerCharacterBase
 {
@@ -41,28 +47,25 @@ protected:
 	void SprintStart();
 	void SprintEnd  ();
 
-	void CrouchStart(const FInputActionValue& inputValue);
-	void CrouchEnd  (const FInputActionValue& inputValue);
-	void Attack     (const FInputActionValue& inputValue);
-	void TEST       (const FInputActionValue& inputValue);
-
-
-
+	void CrouchStart  (const FInputActionValue& inputValue);
+	void AttackAction (const FInputActionValue& inputValue);
+	void TEST         (const FInputActionValue& inputValue);
 
 protected:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Component")
 	class ULOMInputComponent* MyInputCoponent;
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Component")
+	UPROPERTY(EditAnywhere, BlueprintReadWrite    , Category = "Component")
 	class UStateComponent* StateComponent;
 
 
 protected:
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Camera")
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly    , Category = "Camera")
 	class UCameraComponent* playerCam;
 
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Camera")
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly    , Category = "Camera")
 	class USpringArmComponent* springArm;
 
+	//TMap<EActionState> Types;
 };
 

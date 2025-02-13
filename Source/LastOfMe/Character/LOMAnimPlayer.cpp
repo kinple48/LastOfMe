@@ -37,3 +37,9 @@ void ULOMAnimPlayer::NativeUpdateAnimation(float DeltaSeconds)
 
 	bIsCrouched = Player->bIsCrouched;	
 }
+
+void ULOMAnimPlayer::PlayAttackAnim()
+{
+	if(AttackAnimMontage == nullptr) return;
+	Montage_Play(AttackAnimMontage);
+}

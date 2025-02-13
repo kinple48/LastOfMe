@@ -10,6 +10,7 @@
 #include "../Component/LOMInputComponent.h" 
 #include "../Component/StateComponent.h"
 #include "GameFramework/CharacterMovementComponent.h"
+#include "LOMAnimPlayer.h"
 
 
 AMainPlayerCharacter::AMainPlayerCharacter()
@@ -23,7 +24,7 @@ AMainPlayerCharacter::AMainPlayerCharacter()
 	playerCam->SetupAttachment(springArm);
 
 	MyInputCoponent = CreateDefaultSubobject<ULOMInputComponent>(TEXT("MyInputComponent"));
-	StateComponent = CreateDefaultSubobject<UStateComponent>(TEXT("StateComponent"));
+	StateComponent  = CreateDefaultSubobject<UStateComponent>   (TEXT("StateComponent"  ));
 	
 	
 	ConstructorHelpers::FObjectFinder<USkeletalMesh> TempMesh(TEXT("/Script/Engine.SkeletalMesh'/Game/Survival_Character/Meshes/SK_Survival_Character.SK_Survival_Character'"));
@@ -38,6 +39,13 @@ AMainPlayerCharacter::AMainPlayerCharacter()
 	}
 
 	GetCharacterMovement()->NavAgentProps.bCanCrouch = true;
+
+	ConstructorHelpers::FClassFinder<ULOMAnimPlayer> TempAnimInst(TEXT("/Script/Engine.AnimBlueprint'/Game/SSA/Character/ABP_PlayerAnim.ABP_PlayerAnim_C'"));
+	if (TempAnimInst.Succeeded())
+	{
+		GetMesh()->SetAnimInstanceClass(TempAnimInst.Class);
+	}
+
 }
 
 void AMainPlayerCharacter::BeginPlay()
@@ -61,8 +69,6 @@ void AMainPlayerCharacter::BeginPlay()
 void AMainPlayerCharacter::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
-
-	
 }
 
 void AMainPlayerCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
@@ -74,15 +80,17 @@ void AMainPlayerCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInpu
 
 	if (IsValid(EnhancedInputComponent))
 	{
-		EnhancedInputComponent->BindAction(MyInputCoponent->IA_LookUp  , ETriggerEvent::Triggered, this, &AMainPlayerCharacter::LookUp     );
-		EnhancedInputComponent->BindAction(MyInputCoponent->IA_Turn    , ETriggerEvent::Triggered, this, &AMainPlayerCharacter::Turn       );
-		EnhancedInputComponent->BindAction(MyInputCoponent->IA_Move    , ETriggerEvent::Triggered, this, &AMainPlayerCharacter::Move       );
-		EnhancedInputComponent->BindAction(MyInputCoponent->IA_SlowMove, ETriggerEvent::Started  , this, &AMainPlayerCharacter::SlowMove   );
-		EnhancedInputComponent->BindAction(MyInputCoponent->IA_Sprint  , ETriggerEvent::Ongoing  , this, &AMainPlayerCharacter::SprintStart);
-		EnhancedInputComponent->BindAction(MyInputCoponent->IA_Sprint  , ETriggerEvent::Completed, this, &AMainPlayerCharacter::SprintEnd  );
-		EnhancedInputComponent->BindAction(MyInputCoponent->IA_Crouch  , ETriggerEvent::Started  , this, &AMainPlayerCharacter::CrouchStart);
+		EnhancedInputComponent->BindAction(MyInputCoponent->IA_LookUp  , ETriggerEvent::Triggered, this, &AMainPlayerCharacter::LookUp      );
+		EnhancedInputComponent->BindAction(MyInputCoponent->IA_Turn    , ETriggerEvent::Triggered, this, &AMainPlayerCharacter::Turn        );
+		EnhancedInputComponent->BindAction(MyInputCoponent->IA_Move    , ETriggerEvent::Triggered, this, &AMainPlayerCharacter::Move        );
+		EnhancedInputComponent->BindAction(MyInputCoponent->IA_SlowMove, ETriggerEvent::Started  , this, &AMainPlayerCharacter::SlowMove    );
+		EnhancedInputComponent->BindAction(MyInputCoponent->IA_Sprint  , ETriggerEvent::Ongoing  , this, &AMainPlayerCharacter::SprintStart );
+		EnhancedInputComponent->BindAction(MyInputCoponent->IA_Sprint  , ETriggerEvent::Completed, this, &AMainPlayerCharacter::SprintEnd   );
+		EnhancedInputComponent->BindAction(MyInputCoponent->IA_Crouch  , ETriggerEvent::Started  , this, &AMainPlayerCharacter::CrouchStart );
+		EnhancedInputComponent->BindAction(MyInputCoponent->IA_Attack  , ETriggerEvent::Triggered, this, &AMainPlayerCharacter::AttackAction);
 
-		EnhancedInputComponent->BindAction(MyInputCoponent->IA_TEST    , ETriggerEvent::Triggered, this, &AMainPlayerCharacter::TEST);
+
+		EnhancedInputComponent->BindAction(MyInputCoponent->IA_TEST    , ETriggerEvent::Triggered, this, &AMainPlayerCharacter::TEST        );
 	}
 }
 
@@ -169,7 +177,7 @@ void AMainPlayerCharacter::CrouchStart(const FInputActionValue& inputValue)
 {
 	if (bIsCrouched)
 	{
-		UnCrouch();
+		UnCrouch(); 
 		GetCharacterMovement()->MaxWalkSpeed = StateComponent->RunSpeed;
 	}
 	else
@@ -179,14 +187,10 @@ void AMainPlayerCharacter::CrouchStart(const FInputActionValue& inputValue)
 	}
 }
 
-void AMainPlayerCharacter::CrouchEnd(const FInputActionValue& inputValue)
+void AMainPlayerCharacter::AttackAction(const FInputActionValue& inputValue)
 {
-	
-}
-
-void AMainPlayerCharacter::Attack(const FInputActionValue& inputValue)
-{
-
+	auto anim = Cast<ULOMAnimPlayer>(GetMesh()->GetAnimInstance());
+	anim->PlayAttackAnim();
 }
 
 void AMainPlayerCharacter::TEST(const FInputActionValue& inputValue)

@@ -19,6 +19,12 @@ class LASTOFME_API ULOMAnimPlayer : public UAnimInstance
 	virtual void NativeBeginPlay() override;
 	virtual void NativeUpdateAnimation(float DeltaSeconds) override;
 	
+public:
+	void PlayAttackAnim();
+
+	UPROPERTY(EditDefaultsOnly, Category = LOMAnimPlayer)
+	class UAnimMontage* AttackAnimMontage; 
+
 protected:
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
@@ -41,7 +47,4 @@ protected:
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	bool bIsCrouched = false;
-
-	
-
 };
