@@ -33,7 +33,8 @@ void ASpline::IncrementPatrolRoute()
 	PatrollIndex = PatrollIndex + Direction;
 	if (PatrollIndex == splinecomp->GetNumberOfSplinePoints() - 1)
 	{
-		Direction = -1;
+		//Direction = -1;
+		PatrollIndex = 0;
 	}
 	else
 	{
