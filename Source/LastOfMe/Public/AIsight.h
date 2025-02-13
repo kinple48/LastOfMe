@@ -9,9 +9,9 @@
 UENUM()
 enum class enemyAISense
 {
-	Sight UMETA(DisplayName = "시야감지"),
-	Damage UMETA(DisplayName = "피격감지"),
-	Hearing UMETA(DisplayName = "소리감지")
+	Sight ,
+	Damage ,
+	Hearing
 };
 
 

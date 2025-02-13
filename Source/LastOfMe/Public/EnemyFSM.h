@@ -9,12 +9,13 @@
 UENUM(BlueprintType)
 enum class EEnemyState : uint8
 {
-	Idle UMETA(DisplayName = "대기"),
-	Move UMETA(DisplayName = "이동"),
-	Attack UMETA(DisplayName = "공격"),
-	Damage UMETA(DisplayName = "데미지"),
-	Die UMETA(DisplayName = "죽음"),
-	Bite UMETA(DisplayName = "물기")
+	Idle ,
+	Move ,
+	Attack ,
+	Damage ,
+	Die ,
+	Bite,
+	Patrol
 };
 
 UCLASS( ClassGroup=(Custom), meta=(BlueprintSpawnableComponent) )
@@ -55,6 +56,8 @@ public:
 
 	void BiteState();
 
+	void PatrolState();
+
 	UPROPERTY(EditAnywhere, Category = FSM)
 	float TraceRange = 500.0f;
 
@@ -66,10 +69,18 @@ public:
 
 	UPROPERTY(EditAnywhere,BlueprintReadWrite)
 	bool attackstate = false;
-
 	UPROPERTY(EditAnywhere,BlueprintReadWrite)
 	bool bitestate = false;
+	UPROPERTY(EditAnywhere,BlueprintReadWrite)
+	bool walkstate = false;
+	UPROPERTY(EditAnywhere,BlueprintReadWrite)
+	bool runstate = false;
+
 
 	float CurrentTime = 0.f;
 	float BiteTime = 5.0f;
+	float IdleTime = 2.0f;
+
+	void EnterPatrolState();
+
 };

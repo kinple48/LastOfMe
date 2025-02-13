@@ -15,8 +15,8 @@ AAIsight::AAIsight()
 	SetPerceptionComponent(*AIPerception);
 
 	Sightconfig = CreateDefaultSubobject<UAISenseConfig_Sight>(TEXT("SightConfig"));
-	Sightconfig->SightRadius = 800.f;
-	Sightconfig->LoseSightRadius = 1100.f;
+	Sightconfig->SightRadius = 500.f;
+	Sightconfig->LoseSightRadius = 800.f;
 	Sightconfig->PeripheralVisionAngleDegrees = 50.f;
 	Sightconfig->SetMaxAge(3.f);
 	Sightconfig->AutoSuccessRangeFromLastSeenLocation = -1.f;
@@ -31,7 +31,7 @@ AAIsight::AAIsight()
 	Damageconfig = CreateDefaultSubobject<UAISenseConfig_Damage>(TEXT("DamageConfig"));
 	Damageconfig->SetMaxAge(3.f);
 	AIPerception->ConfigureSense(*Damageconfig);
-	
+
 	HearingConfig = CreateDefaultSubobject<UAISenseConfig_Hearing>(TEXT("HearingConfig"));
 	HearingConfig->HearingRange = 500.f;
 	HearingConfig->SetMaxAge(3.f);
@@ -49,17 +49,16 @@ void AAIsight::PerceptionUpdated(const TArray<AActor*>& UpdatedActors)
 	{
 		if (!UpdatedActor->ActorHasTag(TEXT("enemy")))
 		{
-			if (CanSenseActor(UpdatedActor, enemyAISense::Sight) || CanSenseActor(UpdatedActor, enemyAISense::Damage)|| CanSenseActor(UpdatedActor, enemyAISense::Hearing))
+			if (CanSenseActor(UpdatedActor, enemyAISense::Sight) || CanSenseActor(UpdatedActor, enemyAISense::Damage) || CanSenseActor(UpdatedActor, enemyAISense::Hearing))
 			{
 				GEngine->AddOnScreenDebugMessage(-1, 3.0f, FColor::Black, TEXT("hello"));
 				class AEnemy* enemy = Cast<AEnemy>(GetCharacter());
+				enemy->FindComponentByClass<UEnemyFSM>()->runstate = true;
 				enemy->FindComponentByClass<UEnemyFSM>()->mState = EEnemyState::Move;
+
 			}
 
 		}
-
-		
-	
 	}
 }
 
@@ -70,7 +69,7 @@ bool AAIsight::CanSenseActor(AActor* actor, enemyAISense AIPerceptionSense)
 
 	AIPerception->GetActorsPerception(actor, ActorPerceptionBlueprintInfo);
 	TSubclassOf<UAISense> QuerySenseClass;
-	switch(AIPerceptionSense)
+	switch (AIPerceptionSense)
 	{
 	case enemyAISense::Sight:
 		QuerySenseClass = UAISense_Sight::StaticClass();
