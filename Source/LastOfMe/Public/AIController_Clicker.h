@@ -4,29 +4,25 @@
 
 #include "CoreMinimal.h"
 #include "AIController.h"
-#include "AIsight.generated.h"
+#include "AIController_Clicker.generated.h"
 
 UENUM()
-enum class enemyAISense
+enum class enemyAISenseClicker
 {
-	Sight ,
 	Damage ,
 	Hearing
 };
 
-
 UCLASS()
-class LASTOFME_API AAIsight : public AAIController
+class LASTOFME_API AAIController_Clicker : public AAIController
 {
 	GENERATED_BODY()
+
 public:
-	AAIsight();
+	AAIController_Clicker();
 
 	UPROPERTY(EditDefaultsOnly,BlueprintReadOnly)
 	class UAIPerceptionComponent* AIPerception;
-
-	UPROPERTY(EditDefaultsOnly,BlueprintReadOnly)
-	class UAISenseConfig_Sight* Sightconfig;
 
 	UPROPERTY(EditDefaultsOnly,BlueprintReadOnly)
 	class UAISenseConfig_Damage* Damageconfig;
@@ -37,5 +33,5 @@ public:
 	UFUNCTION()
 	void PerceptionUpdated(const TArray<AActor*>& UpdatedActors);
 
-	bool CanSenseActor(AActor* actor, enemyAISense AIPerceptionSense);
+	bool CanSenseActor(AActor* actor, enemyAISenseClicker AIPerceptionSense);
 };

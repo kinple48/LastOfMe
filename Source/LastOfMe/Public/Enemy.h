@@ -33,4 +33,8 @@ public:
 
 	float CurrentTime = 0.f;
 	float NoiseTime = 10.f;
+
+	UPROPERTY(EditAnywhere,BlueprintReadWrite)
+	class ASpline* splineactor;
+	
 };

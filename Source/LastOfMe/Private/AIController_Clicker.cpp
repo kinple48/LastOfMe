@@ -1,7 +1,7 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
-#include "AIsight.h"
-#include "Perception/AISenseConfig_Sight.h"
+
+#include "AIController_Clicker.h"
 #include "Perception/AIPerceptionComponent.h"
 #include "Kismet/KismetSystemLibrary.h"
 #include "Perception/AISenseConfig_Damage.h"
@@ -9,24 +9,10 @@
 #include "EnemyFSM.h"
 #include "Perception/AISenseConfig_Hearing.h"
 
-AAIsight::AAIsight()
+AAIController_Clicker::AAIController_Clicker()
 {
 	AIPerception = CreateDefaultSubobject<UAIPerceptionComponent>(TEXT("AIPerception"));
 	SetPerceptionComponent(*AIPerception);
-
-	Sightconfig = CreateDefaultSubobject<UAISenseConfig_Sight>(TEXT("SightConfig"));
-	Sightconfig->SightRadius = 500.f;
-	Sightconfig->LoseSightRadius = 800.f;
-	Sightconfig->PeripheralVisionAngleDegrees = 50.f;
-	Sightconfig->SetMaxAge(3.f);
-	Sightconfig->AutoSuccessRangeFromLastSeenLocation = -1.f;
-
-	Sightconfig->DetectionByAffiliation.bDetectEnemies = true;
-	Sightconfig->DetectionByAffiliation.bDetectNeutrals = true;
-	Sightconfig->DetectionByAffiliation.bDetectFriendlies = true;
-
-	AIPerception->ConfigureSense(*Sightconfig);
-	AIPerception->SetDominantSense(Sightconfig->GetSenseImplementation());
 
 	Damageconfig = CreateDefaultSubobject<UAISenseConfig_Damage>(TEXT("DamageConfig"));
 	Damageconfig->SetMaxAge(3.f);
@@ -41,28 +27,28 @@ AAIsight::AAIsight()
 	HearingConfig->DetectionByAffiliation.bDetectFriendlies = true;
 	AIPerception->ConfigureSense(*HearingConfig);
 
-	AIPerception->OnPerceptionUpdated.AddDynamic(this, &AAIsight::PerceptionUpdated);
+	AIPerception->OnPerceptionUpdated.AddDynamic(this, &AAIController_Clicker::PerceptionUpdated);
 }
-void AAIsight::PerceptionUpdated(const TArray<AActor*>& UpdatedActors)
+
+void AAIController_Clicker::PerceptionUpdated(const TArray<AActor*>& UpdatedActors)
 {
 	for (AActor* UpdatedActor : UpdatedActors)
 	{
 		if (!UpdatedActor->ActorHasTag(TEXT("enemy")))
 		{
-			if (CanSenseActor(UpdatedActor, enemyAISense::Sight) || CanSenseActor(UpdatedActor, enemyAISense::Damage) || CanSenseActor(UpdatedActor, enemyAISense::Hearing))
+			if (CanSenseActor(UpdatedActor, enemyAISenseClicker::Damage) || CanSenseActor(UpdatedActor, enemyAISenseClicker::Hearing))
 			{
 				GEngine->AddOnScreenDebugMessage(-1, 3.0f, FColor::Black, TEXT("hello"));
 				class AEnemy* enemy = Cast<AEnemy>(GetCharacter());
 				enemy->FindComponentByClass<UEnemyFSM>()->runstate = true;
 				enemy->FindComponentByClass<UEnemyFSM>()->mState = EEnemyState::Move;
-
 			}
 
 		}
 	}
 }
 
-bool AAIsight::CanSenseActor(AActor* actor, enemyAISense AIPerceptionSense)
+bool AAIController_Clicker::CanSenseActor(AActor* actor, enemyAISenseClicker AIPerceptionSense)
 {
 	FActorPerceptionBlueprintInfo ActorPerceptionBlueprintInfo;
 	FAIStimulus ResultStimulus;
@@ -71,13 +57,10 @@ bool AAIsight::CanSenseActor(AActor* actor, enemyAISense AIPerceptionSense)
 	TSubclassOf<UAISense> QuerySenseClass;
 	switch (AIPerceptionSense)
 	{
-	case enemyAISense::Sight:
-		QuerySenseClass = UAISense_Sight::StaticClass();
-		break;
-	case enemyAISense::Damage:
+	case enemyAISenseClicker::Damage:
 		QuerySenseClass = UAISense_Damage::StaticClass();
 		break;
-	case enemyAISense::Hearing:
+	case enemyAISenseClicker::Hearing:
 		QuerySenseClass = UAISenseConfig_Hearing::StaticClass();
 		break;
 	}

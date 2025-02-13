@@ -15,5 +15,7 @@ void UEnemyAnimInstance::NativeUpdateAnimation(float DeltaSeconds)
 	Speed = FVector::DotProduct(velocity, forwardvector);
 	Attackstate = enemy->FSM->attackstate;
 	Bitestate = enemy->FSM->bitestate;
-
+	Walkstate = enemy->FSM->walkstate;
+	Runstate = enemy->FSM->runstate;
 }
+

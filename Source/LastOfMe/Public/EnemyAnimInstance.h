@@ -23,4 +23,12 @@ public:
 
 	UPROPERTY(EditAnywhere,BlueprintReadWrite,Category=EnemyAnimInstance)
 	bool Bitestate = false;
+
+	UPROPERTY(EditAnywhere,BlueprintReadWrite,Category=EnemyAnimInstance)
+	bool Walkstate = false;
+
+	UPROPERTY(EditAnywhere,BlueprintReadWrite,Category=EnemyAnimInstance)
+	bool Runstate = false;
+
 };
+
