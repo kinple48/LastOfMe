@@ -6,6 +6,8 @@
 #include "GameFramework/Actor.h"
 #include "WeaponBase.generated.h"
 
+class ACharacter;
+
 UCLASS()
 class LASTOFME_API AWeaponBase : public AActor
 {
@@ -22,5 +24,8 @@ protected:
 public:	
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
+
+protected:
+	class AMainPlayerCharacter* OwnerCharacter;
 
 };

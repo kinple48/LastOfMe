@@ -16,6 +16,7 @@ class LASTOFME_API ULOMAnimPlayer : public UAnimInstance
 
 	ULOMAnimPlayer();
 
+public:
 	virtual void NativeBeginPlay() override;
 	virtual void NativeUpdateAnimation(float DeltaSeconds) override;
 	

@@ -12,7 +12,12 @@
  UENUM(BlueprintType)
 	 enum class EActionState : uint8
  {
-	 UNARMED, MELEE, BLUNT
+	 UNARMED ,
+	 MELEE   ,
+	 BLUNT   ,
+	 REVOLVER, 
+	 RIFLE   ,
+	 BOW     ,
  };
 
 UCLASS()
@@ -51,6 +56,10 @@ protected:
 	void AttackAction (const FInputActionValue& inputValue);
 	void TEST         (const FInputActionValue& inputValue);
 
+public:
+	UPROPERTY()
+	class ULOMAnimPlayer* Anim;
+
 protected:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Component")
 	class ULOMInputComponent* MyInputCoponent;
@@ -66,6 +75,11 @@ protected:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly    , Category = "Camera")
 	class USpringArmComponent* springArm;
 
-	//TMap<EActionState> Types;
+
+	UPROPERTY(BlueprintReadWrite, EditAnywhere)
+	TMap<EActionState, class AWeaponBase*> ActionTypes;
+
+	UPROPERTY(BlueprintReadWrite, EditAnywhere)
+	TMap<EActionState, TSubclassOf<AWeaponBase>> ActionClasses;
 };
 

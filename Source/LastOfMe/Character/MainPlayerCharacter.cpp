@@ -11,6 +11,7 @@
 #include "../Component/StateComponent.h"
 #include "GameFramework/CharacterMovementComponent.h"
 #include "LOMAnimPlayer.h"
+#include "../Weapon/WeaponBase.h"
 
 
 AMainPlayerCharacter::AMainPlayerCharacter()
@@ -62,8 +63,10 @@ void AMainPlayerCharacter::BeginPlay()
 			subsystem->AddMappingContext(MyInputCoponent->IMC_Player, 0);
 		}
 	}
-
+	
 	GetCharacterMovement()->MaxWalkSpeed = StateComponent->RunSpeed;
+
+	Anim = Cast<ULOMAnimPlayer>(GetMesh()->GetAnimInstance());
 }
 
 void AMainPlayerCharacter::Tick(float DeltaTime)
@@ -87,7 +90,7 @@ void AMainPlayerCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInpu
 		EnhancedInputComponent->BindAction(MyInputCoponent->IA_Sprint  , ETriggerEvent::Ongoing  , this, &AMainPlayerCharacter::SprintStart );
 		EnhancedInputComponent->BindAction(MyInputCoponent->IA_Sprint  , ETriggerEvent::Completed, this, &AMainPlayerCharacter::SprintEnd   );
 		EnhancedInputComponent->BindAction(MyInputCoponent->IA_Crouch  , ETriggerEvent::Started  , this, &AMainPlayerCharacter::CrouchStart );
-		EnhancedInputComponent->BindAction(MyInputCoponent->IA_Attack  , ETriggerEvent::Triggered, this, &AMainPlayerCharacter::AttackAction);
+		EnhancedInputComponent->BindAction(MyInputCoponent->IA_Attack  , ETriggerEvent::Started  , this, &AMainPlayerCharacter::AttackAction);
 
 
 		EnhancedInputComponent->BindAction(MyInputCoponent->IA_TEST    , ETriggerEvent::Triggered, this, &AMainPlayerCharacter::TEST        );
@@ -127,6 +130,7 @@ void AMainPlayerCharacter::Move(const FInputActionValue& inputValue)
 	}
 
 }
+
 
 void AMainPlayerCharacter::SlowMove(const FInputActionValue& inputValue)
 {
@@ -191,6 +195,7 @@ void AMainPlayerCharacter::AttackAction(const FInputActionValue& inputValue)
 {
 	auto anim = Cast<ULOMAnimPlayer>(GetMesh()->GetAnimInstance());
 	anim->PlayAttackAnim();
+	GEngine->AddOnScreenDebugMessage(-1, 3.0f, FColor::Blue, TEXT("Attack!!!!!"));
 }
 
 void AMainPlayerCharacter::TEST(const FInputActionValue& inputValue)

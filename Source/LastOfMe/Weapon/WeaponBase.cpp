@@ -2,12 +2,24 @@
 
 
 #include "WeaponBase.h"
+#include "Engine/SkeletalMesh.h"
+#include "Components/SkeletalMeshComponent.h"
+#include "GameFramework/Character.h"
 
 // Sets default values
 AWeaponBase::AWeaponBase()
 {
  	// Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
+
+	/*Mesh = CreateDefaultSubobject<USkeletalMesh>(TEXT("Mesh"));
+
+	ConstructorHelpers::FObjectFinder<USkeletalMesh> TempMesh (TEXT(""));
+	if (TempMesh.Succeeded())
+	{
+		GetMesh();
+	}*/
+
 
 }
 
