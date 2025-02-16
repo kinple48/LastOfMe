@@ -34,6 +34,15 @@ void AWeaponBase::BeginPlay()
 void AWeaponBase::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
+}
 
+bool AWeaponBase::Attach(USceneComponent* InParent)
+{
+	return AttachToComponent 
+	(
+		InParent,
+		FAttachmentTransformRules(EAttachmentRule::KeepRelative, true),
+		HolsterSocketName 
+	);
 }
 

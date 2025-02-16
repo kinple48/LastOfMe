@@ -12,6 +12,7 @@
 #include "GameFramework/CharacterMovementComponent.h"
 #include "LOMAnimPlayer.h"
 #include "../Weapon/WeaponBase.h"
+#include "Weapon/BluntBase.h"
 
 
 AMainPlayerCharacter::AMainPlayerCharacter()
@@ -94,6 +95,19 @@ void AMainPlayerCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInpu
 
 
 		EnhancedInputComponent->BindAction(MyInputCoponent->IA_TEST    , ETriggerEvent::Triggered, this, &AMainPlayerCharacter::TEST        );
+
+		EnhancedInputComponent->BindAction(MyInputCoponent->IA_ChangeWeapon, ETriggerEvent::Started, this, &AMainPlayerCharacter::OnActionKey);
+	}
+
+	// Spawn Weapon 
+	// 웨픈 베이스로 해줘야하나? 바꿔줘야하면 바꿔주기 부모로 바꿔줌 자식으로 바꾸는게 필요하면 바꾸기 
+	for (auto& pari : ActionClasses)
+	{
+		AWeaponBase* weapon = GetWorld()->SpawnActor<AWeaponBase>(pari.Value);
+
+		weapon->Attach(GetMesh());
+
+		ActionTypes.Add(pari.Key, weapon);
 	}
 }
 
@@ -202,5 +216,22 @@ void AMainPlayerCharacter::TEST(const FInputActionValue& inputValue)
 {
 	MakeNoise(1.0f, this, GetActorLocation(), 1000.f, TEXT("enemysound"));
 	GEngine->AddOnScreenDebugMessage(-1, 3.0f, FColor::Blue, TEXT("enemysound!!!!!"));
+}
+
+void AMainPlayerCharacter::OnActionKey(const FInputActionValue& inputValue)
+{
+	FString string = inputValue.ToString();
+
+	 CurActionType = EActionState::BLUNT;
+}
+
+void AMainPlayerCharacter::OnChangeActions(EActionState InActionType)
+{
+	if (LastActionType == CurActionType)
+		return;
+
+
+	//ChangeWeapon
+	LastActionType = CurActionType;
 }
 

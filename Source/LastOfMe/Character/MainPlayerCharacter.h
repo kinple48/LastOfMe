@@ -56,6 +56,11 @@ protected:
 	void AttackAction (const FInputActionValue& inputValue);
 	void TEST         (const FInputActionValue& inputValue);
 
+	void OnActionKey(const FInputActionValue& inputValue);
+	void OnChangeActions(EActionState InActionType);
+
+
+
 public:
 	UPROPERTY()
 	class ULOMAnimPlayer* Anim;
@@ -76,10 +81,14 @@ protected:
 	class USpringArmComponent* springArm;
 
 
-	UPROPERTY(BlueprintReadWrite, EditAnywhere)
+	UPROPERTY(BlueprintReadWrite, EditAnywhere , Category = "ActionType")
 	TMap<EActionState, class AWeaponBase*> ActionTypes;
 
-	UPROPERTY(BlueprintReadWrite, EditAnywhere)
+	UPROPERTY(BlueprintReadWrite, EditAnywhere , Category = "ActionTypeClass")
 	TMap<EActionState, TSubclassOf<AWeaponBase>> ActionClasses;
+
+	EActionState  CurActionType = EActionState::UNARMED;
+	EActionState LastActionType = EActionState::UNARMED;
+
 };
 
