@@ -23,8 +23,13 @@ public:
 public:
 	void PlayAttackAnim();
 
+	void EquipWeapon();
+
 	UPROPERTY(EditDefaultsOnly, Category = LOMAnimPlayer)
-	class UAnimMontage* AttackAnimMontage; 
+	class UAnimMontage* AttackAnimMontage;
+
+	UPROPERTY(EditDefaultsOnly, Category = LOMAnimPlayer)
+	class UAnimMontage* EquipAnimMontage; 
 
 protected:
 

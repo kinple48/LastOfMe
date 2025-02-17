@@ -223,6 +223,10 @@ void AMainPlayerCharacter::OnActionKey(const FInputActionValue& inputValue)
 	FString string = inputValue.ToString();
 
 	 CurActionType = EActionState::BLUNT;
+
+	 auto anim = Cast<ULOMAnimPlayer>(GetMesh()->GetAnimInstance());
+	 anim->EquipWeapon();
+	 GEngine->AddOnScreenDebugMessage(-1, 3.0f, FColor::Blue, TEXT("OnActionKey"));
 }
 
 void AMainPlayerCharacter::OnChangeActions(EActionState InActionType)
