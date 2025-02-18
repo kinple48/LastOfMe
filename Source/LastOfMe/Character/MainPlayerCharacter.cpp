@@ -232,7 +232,7 @@ void AMainPlayerCharacter::OnActionKey(const FInputActionValue& inputValue)
 	anim->EquipWeapon();
 	 
 	 
-	 //GEngine->AddOnScreenDebugMessage(-1, 3.0f, FColor::Blue, TEXT("OnActionKey"));
+	 GEngine->AddOnScreenDebugMessage(-1, 3.0f, FColor::Blue, TEXT("OnActionKey"));
 }
 
 void AMainPlayerCharacter::OnChangeActions(EActionState InActionType)
