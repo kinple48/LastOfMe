@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "Animation/AnimInstance.h"
+#include "MainPlayerCharacter.h"
 #include "LOMAnimPlayer.generated.h"
 
 /**
@@ -25,11 +26,16 @@ public:
 
 	void EquipWeapon();
 
+	void UnEquipWeapon();
+
 	UPROPERTY(EditDefaultsOnly, Category = LOMAnimPlayer)
 	class UAnimMontage* AttackAnimMontage;
 
 	UPROPERTY(EditDefaultsOnly, Category = LOMAnimPlayer)
 	class UAnimMontage* EquipAnimMontage; 
+
+	UPROPERTY(EditDefaultsOnly, Category = LOMAnimPlayer)
+	class UAnimMontage* UnEquipAnimMontage; 
 
 protected:
 
@@ -53,4 +59,7 @@ protected:
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	bool bIsCrouched = false;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	EActionState CurAction;
 };

@@ -59,7 +59,12 @@ protected:
 	void OnActionKey(const FInputActionValue& inputValue);
 	void OnChangeActions(EActionState InActionType);
 
+	// ?? 동작을 멈추게 하는 것 
+	void StrafeOn();
+	void StrafeOff();
 
+	// 장착 해체 
+	void OnChangeActionEnd(); 
 
 public:
 	UPROPERTY()

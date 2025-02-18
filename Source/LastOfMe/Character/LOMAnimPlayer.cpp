@@ -49,3 +49,9 @@ void ULOMAnimPlayer::EquipWeapon()
 	if (EquipAnimMontage == nullptr) return;
 	Montage_Play(EquipAnimMontage);
 }
+
+void ULOMAnimPlayer::UnEquipWeapon()
+{
+	if (UnEquipAnimMontage == nullptr) return;
+	Montage_Play(UnEquipAnimMontage);
+}

@@ -68,6 +68,17 @@ void AMainPlayerCharacter::BeginPlay()
 	GetCharacterMovement()->MaxWalkSpeed = StateComponent->RunSpeed;
 
 	Anim = Cast<ULOMAnimPlayer>(GetMesh()->GetAnimInstance());
+
+	// Spawn Weapon 
+	// ¿þÇÂ º£ÀÌ½º·Î ÇØÁà¾ßÇÏ³ª? ¹Ù²ãÁà¾ßÇÏ¸é ¹Ù²ãÁÖ±â ºÎ¸ð·Î ¹Ù²ãÁÜ ÀÚ½ÄÀ¸·Î ¹Ù²Ù´Â°Ô ÇÊ¿äÇÏ¸é ¹Ù²Ù±â 
+	for (auto& pari : ActionClasses)
+	{
+		AWeaponBase* weapon = GetWorld()->SpawnActor<AWeaponBase>(pari.Value);
+
+		weapon->Attach(GetMesh());
+
+		ActionTypes.Add(pari.Key, weapon);
+	}
 }
 
 void AMainPlayerCharacter::Tick(float DeltaTime)
@@ -99,16 +110,7 @@ void AMainPlayerCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInpu
 		EnhancedInputComponent->BindAction(MyInputCoponent->IA_ChangeWeapon, ETriggerEvent::Started, this, &AMainPlayerCharacter::OnActionKey);
 	}
 
-	// Spawn Weapon 
-	// ¿þÇÂ º£ÀÌ½º·Î ÇØÁà¾ßÇÏ³ª? ¹Ù²ãÁà¾ßÇÏ¸é ¹Ù²ãÁÖ±â ºÎ¸ð·Î ¹Ù²ãÁÜ ÀÚ½ÄÀ¸·Î ¹Ù²Ù´Â°Ô ÇÊ¿äÇÏ¸é ¹Ù²Ù±â 
-	for (auto& pari : ActionClasses)
-	{
-		AWeaponBase* weapon = GetWorld()->SpawnActor<AWeaponBase>(pari.Value);
-
-		weapon->Attach(GetMesh());
-
-		ActionTypes.Add(pari.Key, weapon);
-	}
+	
 }
 
 void AMainPlayerCharacter::LookUp(const FInputActionValue& inputValue)
@@ -222,20 +224,50 @@ void AMainPlayerCharacter::OnActionKey(const FInputActionValue& inputValue)
 {
 	FString string = inputValue.ToString();
 
-	 CurActionType = EActionState::BLUNT;
 
-	 auto anim = Cast<ULOMAnimPlayer>(GetMesh()->GetAnimInstance());
-	 anim->EquipWeapon();
-	 GEngine->AddOnScreenDebugMessage(-1, 3.0f, FColor::Blue, TEXT("OnActionKey"));
+	OnChangeActions(EActionState::REVOLVER);
+	// CurActionType = EActionState::BLUNT;
+
+	auto anim = Cast<ULOMAnimPlayer>(GetMesh()->GetAnimInstance());
+	anim->EquipWeapon();
+	 
+	 
+	 //GEngine->AddOnScreenDebugMessage(-1, 3.0f, FColor::Blue, TEXT("OnActionKey"));
 }
 
 void AMainPlayerCharacter::OnChangeActions(EActionState InActionType)
 {
-	if (LastActionType == CurActionType)
+	
+	if (InActionType == CurActionType)
 		return;
 
-
 	//ChangeWeapon
+
 	LastActionType = CurActionType;
+     CurActionType =  InActionType;
+
+	OnChangeActionEnd();
+}
+
+void AMainPlayerCharacter::StrafeOn()
+{
+	bUseControllerRotationYaw = true;
+
+	GetCharacterMovement()->bOrientRotationToMovement = false;
+}
+
+void AMainPlayerCharacter::StrafeOff()
+{
+	bUseControllerRotationYaw = false;
+
+	GetCharacterMovement()->bOrientRotationToMovement = true;
+}
+
+void AMainPlayerCharacter::OnChangeActionEnd()
+{
+	if (CurActionType == EActionState::UNARMED)
+		StrafeOff();
+	else
+		StrafeOn();
 }
 
