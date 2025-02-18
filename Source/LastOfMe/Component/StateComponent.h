@@ -40,6 +40,9 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "boolean")
 	bool bIsCrouched = false;
 
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "boolean")
+	bool bIsAttacking = false; 
+
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "MoveSpeed")
 	float CrouchSpeed = 250.0f;
 

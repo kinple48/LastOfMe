@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "Animation/AnimInstance.h"
+#include "MainPlayerCharacter.h"
 #include "LOMAnimPlayer.generated.h"
 
 /**
@@ -16,9 +17,26 @@ class LASTOFME_API ULOMAnimPlayer : public UAnimInstance
 
 	ULOMAnimPlayer();
 
+public:
 	virtual void NativeBeginPlay() override;
 	virtual void NativeUpdateAnimation(float DeltaSeconds) override;
 	
+public:
+	void PlayAttackAnim();
+
+	void EquipWeapon();
+
+	void UnEquipWeapon();
+
+	UPROPERTY(EditDefaultsOnly, Category = LOMAnimPlayer)
+	class UAnimMontage* AttackAnimMontage;
+
+	UPROPERTY(EditDefaultsOnly, Category = LOMAnimPlayer)
+	class UAnimMontage* EquipAnimMontage; 
+
+	UPROPERTY(EditDefaultsOnly, Category = LOMAnimPlayer)
+	class UAnimMontage* UnEquipAnimMontage; 
+
 protected:
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
@@ -42,6 +60,6 @@ protected:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	bool bIsCrouched = false;
 
-	
-
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	EActionState CurAction;
 };

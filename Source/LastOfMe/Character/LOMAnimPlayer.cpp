@@ -37,3 +37,21 @@ void ULOMAnimPlayer::NativeUpdateAnimation(float DeltaSeconds)
 
 	bIsCrouched = Player->bIsCrouched;	
 }
+
+void ULOMAnimPlayer::PlayAttackAnim()
+{
+	if(AttackAnimMontage == nullptr) return;
+	Montage_Play(AttackAnimMontage);
+}
+
+void ULOMAnimPlayer::EquipWeapon()
+{
+	if (EquipAnimMontage == nullptr) return;
+	Montage_Play(EquipAnimMontage);
+}
+
+void ULOMAnimPlayer::UnEquipWeapon()
+{
+	if (UnEquipAnimMontage == nullptr) return;
+	Montage_Play(UnEquipAnimMontage);
+}
