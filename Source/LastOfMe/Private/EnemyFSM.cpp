@@ -81,11 +81,13 @@ void UEnemyFSM::MoveState()
 	FVector dir = destination - me->GetActorLocation();
 
 	FRotator newRotation = dir.Rotation();
+
 	newRotation = UKismetMathLibrary::MakeRotFromXZ(dir,me->GetActorUpVector());
 
 	newRotation = FMath::RInterpTo(me->GetActorRotation(), newRotation, GetWorld()->GetDeltaSeconds(), 0.2f);
 
 	me->SetActorRotation(newRotation);
+
 	me->AddMovementInput(dir);
 	me->GetCharacterMovement()->MaxWalkSpeed = 600;
 
@@ -104,7 +106,10 @@ void UEnemyFSM::AttackState()
 	runstate = false;
 	FVector destination = target->GetActorLocation();
 	FVector dir = destination - me->GetActorLocation();
+
 	me->SetActorRotation(UKismetMathLibrary::MakeRotFromXZ(dir,me->GetActorUpVector()));
+
+
 	CurrentTime += GetWorld()->GetDeltaSeconds();
 	if (CurrentTime >= BiteTime)
 	{
@@ -140,7 +145,7 @@ void UEnemyFSM::PatrolState()
 {
 	if (!me || !me->GetCharacterMovement() || !me->splineactor) return;
 	walkstate = true;
-	me->GetCharacterMovement()->MaxWalkSpeed = 100;
+	me->GetCharacterMovement()->MaxWalkSpeed = 50;
 	FVector destination_sp = me->splineactor->GetSplinePointasWorldPosition();
 	FVector dir_sp = destination_sp - me->GetActorLocation();
 	if (dir_sp.Size() < 150.0f)
@@ -160,7 +165,7 @@ void UEnemyFSM::EnterPatrolState()
 		{
 			return;
 		}
-		//me->splineactor->GetSplinePointasWorldPosition();
+		me->splineactor->GetSplinePointasWorldPosition();
 		AAIsight* Aicontroller = Cast<AAIsight>(me->GetController());
 		if (Aicontroller)
 		{
