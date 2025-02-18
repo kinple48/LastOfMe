@@ -45,8 +45,8 @@ void UEnemyFSM::TickComponent(float DeltaTime, ELevelTick TickType, FActorCompon
 {
 	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
 
-	FString logMsg = UEnum::GetValueAsString(mState);
-	GEngine->AddOnScreenDebugMessage(0, 1.0f, FColor::Red, logMsg);
+	//FString logMsg = UEnum::GetValueAsString(mState);
+	//GEngine->AddOnScreenDebugMessage(0, 1.0f, FColor::Red, logMsg);
 
 	switch (mState)
 	{
@@ -81,7 +81,7 @@ void UEnemyFSM::MoveState()
 	FVector dir = destination - me->GetActorLocation();
 
 	FRotator newRotation = dir.Rotation();
-	newRotation = UKismetMathLibrary::MakeRotFromZ(dir);
+	newRotation = UKismetMathLibrary::MakeRotFromXZ(dir,me->GetActorUpVector());
 
 	newRotation = FMath::RInterpTo(me->GetActorRotation(), newRotation, GetWorld()->GetDeltaSeconds(), 0.2f);
 
@@ -104,7 +104,7 @@ void UEnemyFSM::AttackState()
 	runstate = false;
 	FVector destination = target->GetActorLocation();
 	FVector dir = destination - me->GetActorLocation();
-	me->SetActorRotation(UKismetMathLibrary::MakeRotFromZ(dir));
+	me->SetActorRotation(UKismetMathLibrary::MakeRotFromXZ(dir,me->GetActorUpVector()));
 	CurrentTime += GetWorld()->GetDeltaSeconds();
 	if (CurrentTime >= BiteTime)
 	{
