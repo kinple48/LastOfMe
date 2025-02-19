@@ -107,10 +107,8 @@ void AMainPlayerCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInpu
 
 		EnhancedInputComponent->BindAction(MyInputCoponent->IA_TEST    , ETriggerEvent::Triggered, this, &AMainPlayerCharacter::TEST        );
 
-		EnhancedInputComponent->BindAction(MyInputCoponent->IA_ChangeWeapon, ETriggerEvent::Started, this, &AMainPlayerCharacter::OnActionKey);
+		EnhancedInputComponent->BindAction(MyInputCoponent->IA_ChangeWeapon, ETriggerEvent::Started, this, &AMainPlayerCharacter::OnRevolverKey);
 	}
-
-	
 }
 
 void AMainPlayerCharacter::LookUp(const FInputActionValue& inputValue)
@@ -144,9 +142,7 @@ void AMainPlayerCharacter::Move(const FInputActionValue& inputValue)
 		AddMovementInput(ForwardDirection, MovementVector.X);
 		AddMovementInput(RightDirection  , MovementVector.Y);
 	}
-
 }
-
 
 void AMainPlayerCharacter::SlowMove(const FInputActionValue& inputValue)
 {
@@ -220,7 +216,7 @@ void AMainPlayerCharacter::TEST(const FInputActionValue& inputValue)
 	GEngine->AddOnScreenDebugMessage(-1, 3.0f, FColor::Blue, TEXT("enemysound!!!!!"));
 }
 
-void AMainPlayerCharacter::OnActionKey(const FInputActionValue& inputValue)
+void AMainPlayerCharacter::OnRevolverKey(const FInputActionValue& inputValue)
 {
 	FString string = inputValue.ToString();
 
@@ -231,7 +227,17 @@ void AMainPlayerCharacter::OnActionKey(const FInputActionValue& inputValue)
 	//auto anim = Cast<ULOMAnimPlayer>(GetMesh()->GetAnimInstance());
 	//anim->EquipWeapon();
 
-	GEngine->AddOnScreenDebugMessage(-1, 3.0f, FColor::Blue, TEXT("OnActionKey"));
+	GEngine->AddOnScreenDebugMessage(-1, 3.0f, FColor::Blue, TEXT("OnRevolverKey"));
+}
+
+void AMainPlayerCharacter::OnRifleKey(const FInputActionValue& inputValue)
+{
+
+}
+
+void AMainPlayerCharacter::OnBluntKey(const FInputActionValue& inputValue)
+{
+
 }
 
 void AMainPlayerCharacter::OnChangeActions(EActionState InActionType)

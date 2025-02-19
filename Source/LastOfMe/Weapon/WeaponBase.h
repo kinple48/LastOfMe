@@ -46,6 +46,12 @@ public:
 	UAnimMontage* GetSheathMontage() { return SheathMontage; }
 
 
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Montage)
+	UAnimMontage* DrawMontage; 
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Montage)
+	UAnimMontage* SheathMontage;
+
 protected:
 	class AMainPlayerCharacter* OwnerCharacter;
 
@@ -59,11 +65,7 @@ protected:
 
 	class AFireFly* fireFly;
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Montage)
-	UAnimMontage* DrawMontage; 
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Montage)
-	UAnimMontage* SheathMontage;
+	
 
 
 };

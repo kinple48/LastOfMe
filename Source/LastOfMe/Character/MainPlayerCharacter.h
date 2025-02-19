@@ -9,15 +9,17 @@
 /**
  * 
  */
+ class AWeaponBase;
+
  UENUM(BlueprintType)
 	 enum class EActionState : uint8
  {
 	 UNARMED ,
 	 REVOLVER, 
 	 RIFLE   ,
+	 BLUNT   ,
 	 BOW     ,
 	 MELEE   ,
-	 BLUNT   ,
  };
 
 UCLASS()
@@ -45,9 +47,10 @@ public:
 	UFUNCTION(BlueprintCallable)
 	EActionState GetActionType() { return CurActionType; }
 
-	// 장착 해체 
+	// 장착 동작을 하면 손에 무기를 붙일 것이다. 
 	UFUNCTION(BlueprintCallable)
 	void OnChangeActionEnd(); 
+
 
 protected:
 	void LookUp     (const FInputActionValue& inputValue);
@@ -62,7 +65,9 @@ protected:
 	void AttackAction (const FInputActionValue& inputValue);
 	void TEST         (const FInputActionValue& inputValue);
 
-	void OnActionKey(const FInputActionValue& inputValue);
+	void OnRevolverKey(const FInputActionValue& inputValue);
+	void OnRifleKey   (const FInputActionValue& inputValue);
+	void OnBluntKey   (const FInputActionValue& inputValue);
 	void OnChangeActions(EActionState InActionType);
 
 	// ?? 동작을 멈추게 하는 것 

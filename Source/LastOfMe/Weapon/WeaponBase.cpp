@@ -5,6 +5,7 @@
 #include "Engine/SkeletalMesh.h"
 #include "Components/SkeletalMeshComponent.h"
 #include "GameFramework/Character.h"
+#include "Animation/AnimMontage.h"
 
 // Sets default values
 AWeaponBase::AWeaponBase()
@@ -21,6 +22,7 @@ AWeaponBase::AWeaponBase()
 	}*/
 
 	OwnerCharacter = Cast <AMainPlayerCharacter>(GetOwner());
+
 }
 
 // Called when the game starts or when spawned
