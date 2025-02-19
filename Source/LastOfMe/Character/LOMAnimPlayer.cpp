@@ -36,6 +36,8 @@ void ULOMAnimPlayer::NativeUpdateAnimation(float DeltaSeconds)
 	CrouchDirection = CalculateDirection(velocity, BaseRotator);
 
 	bIsCrouched = Player->bIsCrouched;	
+
+	CurAction = Player->GetActionType();
 }
 
 void ULOMAnimPlayer::PlayAttackAnim()
@@ -54,4 +56,23 @@ void ULOMAnimPlayer::UnEquipWeapon()
 {
 	if (UnEquipAnimMontage == nullptr) return;
 	Montage_Play(UnEquipAnimMontage);
+}
+
+void ULOMAnimPlayer::AnimNotify_AttackEnd()
+{
+	Player = Cast<AMainPlayerCharacter>(TryGetPawnOwner());
+	if (Player != nullptr)
+	{
+		Player->Anim->AnimNotify_AttackEnd();
+	}
+}
+
+void ULOMAnimPlayer::AttachRevolver()
+{
+	Player = Cast<AMainPlayerCharacter>(TryGetPawnOwner());
+	if (Player != nullptr)
+	{
+		//Player->Anim->AttachRevolver();
+		Player->OnChangeActionEnd();
+	}
 }

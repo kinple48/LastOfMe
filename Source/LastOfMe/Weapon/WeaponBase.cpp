@@ -20,7 +20,7 @@ AWeaponBase::AWeaponBase()
 		GetMesh();
 	}*/
 
-
+	OwnerCharacter = Cast <AMainPlayerCharacter>(GetOwner());
 }
 
 // Called when the game starts or when spawned
@@ -36,7 +36,7 @@ void AWeaponBase::Tick(float DeltaTime)
 	Super::Tick(DeltaTime);
 }
 
-bool AWeaponBase::Attach(USceneComponent* InParent)
+bool AWeaponBase::AttachToHolster(USceneComponent* InParent)
 {
 	return AttachToComponent 
 	(
@@ -44,5 +44,25 @@ bool AWeaponBase::Attach(USceneComponent* InParent)
 		FAttachmentTransformRules(EAttachmentRule::KeepRelative, true),
 		HolsterSocketName 
 	);
+}
+
+bool AWeaponBase::AttachToHand(USceneComponent* InParent)
+{
+	return AttachToComponent
+	(
+		InParent,
+		FAttachmentTransformRules(EAttachmentRule::KeepRelative, true),
+		EquipSocketName
+	);
+}
+
+void AWeaponBase::Attack()
+{
+
+}
+
+void AWeaponBase::OnBodyColliderBeginOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
+{
+
 }
 

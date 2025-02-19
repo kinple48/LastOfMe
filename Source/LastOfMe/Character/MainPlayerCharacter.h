@@ -13,11 +13,11 @@
 	 enum class EActionState : uint8
  {
 	 UNARMED ,
-	 MELEE   ,
-	 BLUNT   ,
 	 REVOLVER, 
 	 RIFLE   ,
 	 BOW     ,
+	 MELEE   ,
+	 BLUNT   ,
  };
 
 UCLASS()
@@ -40,8 +40,14 @@ public:
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
 	
 public:
-	bool GetIsCrouched() { return bIsCrouched; }
+	//bool GetIsCrouched() { return bIsCrouched; }
 
+	UFUNCTION(BlueprintCallable)
+	EActionState GetActionType() { return CurActionType; }
+
+	// ¿Â¬¯ «ÿ√º 
+	UFUNCTION(BlueprintCallable)
+	void OnChangeActionEnd(); 
 
 protected:
 	void LookUp     (const FInputActionValue& inputValue);
@@ -63,8 +69,15 @@ protected:
 	void StrafeOn();
 	void StrafeOff();
 
-	// ¿Â¬¯ «ÿ√º 
-	void OnChangeActionEnd(); 
+	
+
+	AWeaponBase* GetCurrentAction()
+	{
+		if (ActionTypes.Contains(CurActionType))
+			return ActionTypes[CurActionType];
+
+		return nullptr; 
+	}
 
 public:
 	UPROPERTY()
@@ -79,12 +92,14 @@ protected:
 
 
 protected:
+
+
+public:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly    , Category = "Camera")
 	class UCameraComponent* playerCam;
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly    , Category = "Camera")
 	class USpringArmComponent* springArm;
-
 
 	UPROPERTY(BlueprintReadWrite, EditAnywhere , Category = "ActionType")
 	TMap<EActionState, class AWeaponBase*> ActionTypes;
@@ -93,7 +108,7 @@ protected:
 	TMap<EActionState, TSubclassOf<AWeaponBase>> ActionClasses;
 
 	EActionState  CurActionType = EActionState::UNARMED;
-	EActionState LastActionType = EActionState::UNARMED;
+	EActionState NextActionType = EActionState::UNARMED;
 
 };
 

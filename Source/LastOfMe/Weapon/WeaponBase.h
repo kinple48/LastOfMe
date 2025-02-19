@@ -26,14 +26,44 @@ public:
 	virtual void Tick(float DeltaTime) override;
 
 public:
-	bool Attach(USceneComponent* InParent);
+	bool AttachToHolster(USceneComponent* InParent);
+	bool AttachToHand   (USceneComponent* InParent);
+
+	virtual void Attack();
+
+	UFUNCTION()
+	void OnBodyColliderBeginOverlap
+	(
+		UPrimitiveComponent* OverlappedComponent,
+		AActor* OtherActor,
+		UPrimitiveComponent* OtherComp,
+		int32 OtherBodyIndex,
+		bool bFromSweep,
+		const FHitResult& SweepResult
+	);
+
+	UAnimMontage*   GetDrawMontage() { return DrawMontage;   }
+	UAnimMontage* GetSheathMontage() { return SheathMontage; }
+
 
 protected:
 	class AMainPlayerCharacter* OwnerCharacter;
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Name)
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Name) 
 	FName HolsterSocketName;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Name)
 	FName EquipSocketName; 
+
+	class AEnemy* Zombi; 
+
+	class AFireFly* fireFly;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Montage)
+	UAnimMontage* DrawMontage; 
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Montage)
+	UAnimMontage* SheathMontage;
+
+
 };

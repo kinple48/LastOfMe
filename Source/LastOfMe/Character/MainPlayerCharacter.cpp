@@ -75,7 +75,7 @@ void AMainPlayerCharacter::BeginPlay()
 	{
 		AWeaponBase* weapon = GetWorld()->SpawnActor<AWeaponBase>(pari.Value);
 
-		weapon->Attach(GetMesh());
+		weapon->AttachToHolster(GetMesh());
 
 		ActionTypes.Add(pari.Key, weapon);
 	}
@@ -228,25 +228,51 @@ void AMainPlayerCharacter::OnActionKey(const FInputActionValue& inputValue)
 	OnChangeActions(EActionState::REVOLVER);
 	// CurActionType = EActionState::BLUNT;
 
-	auto anim = Cast<ULOMAnimPlayer>(GetMesh()->GetAnimInstance());
-	anim->EquipWeapon();
-	 
-	 
-	 GEngine->AddOnScreenDebugMessage(-1, 3.0f, FColor::Blue, TEXT("OnActionKey"));
+	//auto anim = Cast<ULOMAnimPlayer>(GetMesh()->GetAnimInstance());
+	//anim->EquipWeapon();
+
+	GEngine->AddOnScreenDebugMessage(-1, 3.0f, FColor::Blue, TEXT("OnActionKey"));
 }
 
 void AMainPlayerCharacter::OnChangeActions(EActionState InActionType)
 {
+	if (GetCurrentAction() != nullptr)
+	{
+		if (GetMesh()->GetAnimInstance()->Montage_IsPlaying(GetCurrentAction()->GetDrawMontage()))
+			return;
+		if (GetMesh()->GetAnimInstance()->Montage_IsPlaying(GetCurrentAction()->GetSheathMontage()))
+			return;
+	}
 	
-	if (InActionType == CurActionType)
-		return;
-
 	//ChangeWeapon
+	 switch (CurActionType)
+	 {
+	 case EActionState::UNARMED:
+		  CurActionType = InActionType;
+		 NextActionType = InActionType;
+		 PlayAnimMontage(GetCurrentAction()->GetDrawMontage());
+		 break;
+	 default:
+		 PlayAnimMontage(GetCurrentAction()->GetSheathMontage());
 
-	LastActionType = CurActionType;
-     CurActionType =  InActionType;
+		 if (CurActionType != InActionType)
+			 NextActionType = InActionType;
 
-	OnChangeActionEnd();
+		 break;
+	 }
+
+	/*case EActionState::REVOLVER:
+		CurActionType = InActionType;
+		PlayAnimMontage(GetCurrentAction()->GetDrawMontage());
+		break;
+	case EActionState::RIFLE:
+		break;
+	case EActionState::BOW:
+		break;
+	case EActionState::MELEE:
+		break;
+	case EActionState::BLUNT:
+		break;*/
 }
 
 void AMainPlayerCharacter::StrafeOn()
@@ -265,9 +291,14 @@ void AMainPlayerCharacter::StrafeOff()
 
 void AMainPlayerCharacter::OnChangeActionEnd()
 {
+	ActionTypes[NextActionType]->AttachToHand(GetMesh());
+
+	NextActionType = EActionState::UNARMED;
+
 	if (CurActionType == EActionState::UNARMED)
 		StrafeOff();
 	else
 		StrafeOn();
+	
 }
 
