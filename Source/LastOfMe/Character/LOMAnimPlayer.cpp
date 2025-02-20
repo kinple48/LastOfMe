@@ -67,12 +67,12 @@ void ULOMAnimPlayer::AnimNotify_AttackEnd()
 	}
 }
 
-void ULOMAnimPlayer::AttachRevolver()
+void ULOMAnimPlayer::AnimNotify_AttachRevolver()
 {
 	Player = Cast<AMainPlayerCharacter>(TryGetPawnOwner());
 	if (Player != nullptr)
 	{
 		//Player->Anim->AttachRevolver();
-		Player->OnChangeActionEnd();
+		Player->OnDrawActionEnd();
 	}
 }

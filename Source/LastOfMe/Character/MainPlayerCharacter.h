@@ -49,8 +49,11 @@ public:
 
 	// 장착 동작을 하면 손에 무기를 붙일 것이다. 
 	UFUNCTION(BlueprintCallable)
-	void OnChangeActionEnd(); 
+	void OnDrawActionEnd(); 
 
+	// 장착 해제 무기를 장비로 집어넣는다. 
+	UFUNCTION(BlueprintCallable)
+	void OnSheathActionEnd();
 
 protected:
 	void LookUp     (const FInputActionValue& inputValue);
@@ -70,7 +73,10 @@ protected:
 	void OnBluntKey   (const FInputActionValue& inputValue);
 	void OnChangeActions(EActionState InActionType);
 
-	// ?? 동작을 멈추게 하는 것 
+	void OnAttackBegin();
+	void OnAttackEnd();
+
+	// ?? 동작을 멈추게 하는 것 카메라 전환이라 나는 필요없음.. 
 	void StrafeOn();
 	void StrafeOff();
 
@@ -115,5 +121,6 @@ public:
 	EActionState  CurActionType = EActionState::UNARMED;
 	EActionState NextActionType = EActionState::UNARMED;
 
+	bool bIsAttacking = false; 
 };
 

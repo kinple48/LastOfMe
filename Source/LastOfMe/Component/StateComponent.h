@@ -25,10 +25,17 @@ public:
 	virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
 
 public:
+
+
+public:
 	
 	UStateComponent* SetIsWalking  (bool IsWalking)  { this->bIsWalking  = IsWalking;  return this; }
 	UStateComponent* SetIsSprint   (bool IsSprint)   { this->bIsSprint   = IsSprint;   return this; }
 	UStateComponent* SetIsCrouched (bool IsCrouched) { this->bIsCrouched = IsCrouched; return this; }
+
+	//UStateComponent* SetMaxHP(float MaxHP) { this->MaxHP = MaxHP; return this; }
+
+
 
 public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "boolean")
@@ -54,5 +61,13 @@ public:
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "MoveSpeed")
 	float SprintSpeed = 800.0f;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "State")
+	float MaxHP = 0.0f;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "State")
+	float CurHP = 0.0f;
+
+
 		
 };

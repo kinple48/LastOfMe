@@ -54,5 +54,9 @@ public:
 	UPROPERTY(EditDefaultsOnly, Category = "Input")
 	class UInputAction* IA_ChangeWeapon;
 
+	//UPROPERTY(EditDefaultsOnly, Category = "Input")
+	//class UInputAction* IA_ChangeRifle;
+
+
 };
 

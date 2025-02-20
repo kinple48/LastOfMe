@@ -6,6 +6,7 @@
 #include "Components/SkeletalMeshComponent.h"
 #include "GameFramework/Character.h"
 #include "Animation/AnimMontage.h"
+#include "../Character/LOMAnimPlayer.h"
 
 // Sets default values
 AWeaponBase::AWeaponBase()
@@ -21,7 +22,6 @@ AWeaponBase::AWeaponBase()
 		GetMesh();
 	}*/
 
-	OwnerCharacter = Cast <AMainPlayerCharacter>(GetOwner());
 
 }
 
@@ -30,6 +30,7 @@ void AWeaponBase::BeginPlay()
 {
 	Super::BeginPlay();
 	
+	OwnerCharacter = Cast <AMainPlayerCharacter>(GetOwner());
 }
 
 // Called every frame
@@ -59,8 +60,8 @@ bool AWeaponBase::AttachToHand(USceneComponent* InParent)
 }
 
 void AWeaponBase::Attack()
-{
-
+{	
+	OwnerCharacter->PlayAnimMontage(AttackMontage);
 }
 
 void AWeaponBase::OnBodyColliderBeginOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)

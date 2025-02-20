@@ -71,9 +71,13 @@ void AMainPlayerCharacter::BeginPlay()
 
 	// Spawn Weapon 
 	// 웨픈 베이스로 해줘야하나? 바꿔줘야하면 바꿔주기 부모로 바꿔줌 자식으로 바꾸는게 필요하면 바꾸기 
+	FActorSpawnParameters Param;
+
+	Param.Owner = this;
+
 	for (auto& pari : ActionClasses)
 	{
-		AWeaponBase* weapon = GetWorld()->SpawnActor<AWeaponBase>(pari.Value);
+		AWeaponBase* weapon = GetWorld()->SpawnActor<AWeaponBase>(pari.Value, Param);
 
 		weapon->AttachToHolster(GetMesh());
 
@@ -205,9 +209,41 @@ void AMainPlayerCharacter::CrouchStart(const FInputActionValue& inputValue)
 
 void AMainPlayerCharacter::AttackAction(const FInputActionValue& inputValue)
 {
-	auto anim = Cast<ULOMAnimPlayer>(GetMesh()->GetAnimInstance());
-	anim->PlayAttackAnim();
-	GEngine->AddOnScreenDebugMessage(-1, 3.0f, FColor::Blue, TEXT("Attack!!!!!"));
+	if (bIsAttacking)
+		return;
+
+	switch (CurActionType)
+	{
+	case EActionState::UNARMED:
+		break;
+	default:
+		GetCurrentAction()->Attack();
+		break;
+	}
+
+	/*switch (CurActionType)
+	{
+	case EActionState::UNARMED:
+		auto anim = Cast<ULOMAnimPlayer>(GetMesh()->GetAnimInstance());
+		anim->PlayAttackAnim();
+		GEngine->AddOnScreenDebugMessage(-1, 3.0f, FColor::Blue, TEXT("Attack!!!!!"));
+		break;
+	case EActionState::REVOLVER:
+		break;
+	case EActionState::RIFLE:
+		break;
+	case EActionState::BLUNT:
+		break;
+	case EActionState::BOW:
+		break;
+	case EActionState::MELEE:
+
+		break;
+		default:
+		break;
+	}*/
+
+	
 }
 
 void AMainPlayerCharacter::TEST(const FInputActionValue& inputValue)
@@ -281,6 +317,16 @@ void AMainPlayerCharacter::OnChangeActions(EActionState InActionType)
 		break;*/
 }
 
+void AMainPlayerCharacter::OnAttackBegin()
+{
+	bIsAttacking = true;
+}
+
+void AMainPlayerCharacter::OnAttackEnd()
+{
+	bIsAttacking = false; 
+}
+
 void AMainPlayerCharacter::StrafeOn()
 {
 	bUseControllerRotationYaw = true;
@@ -295,16 +341,34 @@ void AMainPlayerCharacter::StrafeOff()
 	GetCharacterMovement()->bOrientRotationToMovement = true;
 }
 
-void AMainPlayerCharacter::OnChangeActionEnd()
+void AMainPlayerCharacter::OnDrawActionEnd()
 {
 	ActionTypes[NextActionType]->AttachToHand(GetMesh());
 
 	NextActionType = EActionState::UNARMED;
 
-	if (CurActionType == EActionState::UNARMED)
-		StrafeOff();
-	else
-		StrafeOn();
+	//if (CurActionType == EActionState::UNARMED)
+	//	StrafeOff();
+	//else
+	//	StrafeOn();
 	
+}
+
+void AMainPlayerCharacter::OnSheathActionEnd()
+{
+	GetCurrentAction()->AttachToHolster(GetMesh());
+
+	if (NextActionType == EActionState::UNARMED)
+	{
+	    CurActionType = EActionState::UNARMED;
+		//StrafeOff();
+	}
+
+	else
+	{
+		CurActionType = NextActionType;
+
+		PlayAnimMontage(GetCurrentAction()->GetDrawMontage());
+	}
 }
 
