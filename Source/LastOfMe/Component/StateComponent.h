@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "Components/ActorComponent.h"
+#include "Animation/AnimInstance.h"
 #include "StateComponent.generated.h"
 
 
@@ -26,14 +27,15 @@ public:
 
 public:
 
-
-public:
+	// 빌드업 패턴? 하나씩 빌드가 가능함 자기 자신을 반환
 	
 	UStateComponent* SetIsWalking  (bool IsWalking)  { this->bIsWalking  = IsWalking;  return this; }
 	UStateComponent* SetIsSprint   (bool IsSprint)   { this->bIsSprint   = IsSprint;   return this; }
 	UStateComponent* SetIsCrouched (bool IsCrouched) { this->bIsCrouched = IsCrouched; return this; }
 
-	//UStateComponent* SetMaxHP(float MaxHP) { this->MaxHP = MaxHP; return this; }
+	UStateComponent* SetMaxHP (float   InMaxHP) { this->MaxHP  =  InMaxHP;  return this; }
+	UStateComponent* SetCurHP (float   InCurHP) { this->CurHP  =  InCurHP;  return this; }
+	UStateComponent* SetDamage(int32  InDamage) { this->Damage = InDamage;  return this; }
 
 
 
@@ -63,10 +65,13 @@ public:
 	float SprintSpeed = 800.0f;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "State")
-	float MaxHP = 0.0f;
+	int32 Damage;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "State")
-	float CurHP = 0.0f;
+	float MaxHP;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "State")
+	float CurHP;
 
 
 		

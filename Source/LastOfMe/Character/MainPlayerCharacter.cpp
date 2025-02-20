@@ -13,6 +13,7 @@
 #include "LOMAnimPlayer.h"
 #include "../Weapon/WeaponBase.h"
 #include "Weapon/BluntBase.h"
+#include "Components/ShapeComponent.h"
 
 
 AMainPlayerCharacter::AMainPlayerCharacter()
@@ -48,6 +49,7 @@ AMainPlayerCharacter::AMainPlayerCharacter()
 		GetMesh()->SetAnimInstanceClass(TempAnimInst.Class);
 	}
 
+
 }
 
 void AMainPlayerCharacter::BeginPlay()
@@ -70,7 +72,7 @@ void AMainPlayerCharacter::BeginPlay()
 	Anim = Cast<ULOMAnimPlayer>(GetMesh()->GetAnimInstance());
 
 	// Spawn Weapon 
-	// ¿þÇÂ º£ÀÌ½º·Î ÇØÁà¾ßÇÏ³ª? ¹Ù²ãÁà¾ßÇÏ¸é ¹Ù²ãÁÖ±â ºÎ¸ð·Î ¹Ù²ãÁÜ ÀÚ½ÄÀ¸·Î ¹Ù²Ù´Â°Ô ÇÊ¿äÇÏ¸é ¹Ù²Ù±â 
+			// ¿þÇÂ º£ÀÌ½º·Î ÇØÁà¾ßÇÏ³ª? ¹Ù²ãÁà¾ßÇÏ¸é ¹Ù²ãÁÖ±â ºÎ¸ð·Î ¹Ù²ãÁÜ ÀÚ½ÄÀ¸·Î ¹Ù²Ù´Â°Ô ÇÊ¿äÇÏ¸é ¹Ù²Ù±â 
 	FActorSpawnParameters Param;
 
 	Param.Owner = this;
@@ -83,6 +85,7 @@ void AMainPlayerCharacter::BeginPlay()
 
 		ActionTypes.Add(pari.Key, weapon);
 	}
+
 }
 
 void AMainPlayerCharacter::Tick(float DeltaTime)
@@ -112,6 +115,10 @@ void AMainPlayerCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInpu
 		EnhancedInputComponent->BindAction(MyInputCoponent->IA_TEST    , ETriggerEvent::Triggered, this, &AMainPlayerCharacter::TEST        );
 
 		EnhancedInputComponent->BindAction(MyInputCoponent->IA_ChangeWeapon, ETriggerEvent::Started, this, &AMainPlayerCharacter::OnRevolverKey);
+		EnhancedInputComponent->BindAction(MyInputCoponent->IA_ChangeRifle , ETriggerEvent::Started, this, &AMainPlayerCharacter::OnRifleKey);
+		EnhancedInputComponent->BindAction(MyInputCoponent->IA_ChangeBlunt, ETriggerEvent::Started, this, &AMainPlayerCharacter::OnBluntKey);
+
+
 	}
 }
 
@@ -268,12 +275,30 @@ void AMainPlayerCharacter::OnRevolverKey(const FInputActionValue& inputValue)
 
 void AMainPlayerCharacter::OnRifleKey(const FInputActionValue& inputValue)
 {
+	FString string = inputValue.ToString();
 
+
+	OnChangeActions(EActionState::RIFLE);
+	// CurActionType = EActionState::BLUNT;
+
+	//auto anim = Cast<ULOMAnimPlayer>(GetMesh()->GetAnimInstance());
+	//anim->EquipWeapon();
+
+	GEngine->AddOnScreenDebugMessage(-1, 3.0f, FColor::Blue, TEXT("RIFLE"));
 }
 
 void AMainPlayerCharacter::OnBluntKey(const FInputActionValue& inputValue)
 {
+	FString string = inputValue.ToString();
 
+
+	OnChangeActions(EActionState::BLUNT);
+	// CurActionType = EActionState::BLUNT;
+
+	//auto anim = Cast<ULOMAnimPlayer>(GetMesh()->GetAnimInstance());
+	//anim->EquipWeapon();
+
+	GEngine->AddOnScreenDebugMessage(-1, 3.0f, FColor::Blue, TEXT("BLUNT"));
 }
 
 void AMainPlayerCharacter::OnChangeActions(EActionState InActionType)
@@ -317,14 +342,19 @@ void AMainPlayerCharacter::OnChangeActions(EActionState InActionType)
 		break;*/
 }
 
+
 void AMainPlayerCharacter::OnAttackBegin()
 {
 	bIsAttacking = true;
+
+	//GetCurrentAction()->GetBodyCollider()->SetCollisionEnabled(ECollisionEnabled::QueryAndPhysics); // ÃÑÀÏ ¶§´Â »©±â 
 }
 
 void AMainPlayerCharacter::OnAttackEnd()
 {
 	bIsAttacking = false; 
+	//GetCurrentAction()->GetBodyCollider()->SetCollisionEnabled(ECollisionEnabled::NoCollision); // ÃÑÀÏ ¶§´Â »©±â 
+
 }
 
 void AMainPlayerCharacter::StrafeOn()

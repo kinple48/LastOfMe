@@ -6,6 +6,7 @@
 #include "GameFramework/CharacterMovementComponent.h"
 #include "../Component/StateComponent.h"
 
+
 ULOMAnimPlayer::ULOMAnimPlayer()
 {
 }
@@ -34,6 +35,7 @@ void ULOMAnimPlayer::NativeUpdateAnimation(float DeltaSeconds)
 	
 	FRotator BaseRotator = Player->GetActorRotation();
 	CrouchDirection = CalculateDirection(velocity, BaseRotator);
+	
 
 	bIsCrouched = Player->bIsCrouched;	
 

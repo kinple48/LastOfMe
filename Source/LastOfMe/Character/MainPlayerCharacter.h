@@ -55,6 +55,14 @@ public:
 	UFUNCTION(BlueprintCallable)
 	void OnSheathActionEnd();
 
+	// 공격 중 일 때
+	UFUNCTION(BlueprintCallable)
+	void OnAttackBegin();
+
+	//공격이 끝날 때 
+	UFUNCTION(BlueprintCallable)
+	void OnAttackEnd();
+
 protected:
 	void LookUp     (const FInputActionValue& inputValue);
 	void Turn       (const FInputActionValue& inputValue);
@@ -71,16 +79,14 @@ protected:
 	void OnRevolverKey(const FInputActionValue& inputValue);
 	void OnRifleKey   (const FInputActionValue& inputValue);
 	void OnBluntKey   (const FInputActionValue& inputValue);
+
 	void OnChangeActions(EActionState InActionType);
 
-	void OnAttackBegin();
-	void OnAttackEnd();
+
 
 	// ?? 동작을 멈추게 하는 것 카메라 전환이라 나는 필요없음.. 
 	void StrafeOn();
 	void StrafeOff();
-
-	
 
 	AWeaponBase* GetCurrentAction()
 	{
@@ -122,5 +128,7 @@ public:
 	EActionState NextActionType = EActionState::UNARMED;
 
 	bool bIsAttacking = false; 
+
+	
 };
 
