@@ -30,8 +30,8 @@ public:
 
 public:
 
-	UPROPERTY(EditAnywhere, Category = BulletEffect)
-	class UParticleSystem* BulletEffectFactory;
+	//UPROPERTY(EditAnywhere, Category = BulletEffect)
+	//class UParticleSystem* BulletEffectFactory;
 
 
 };

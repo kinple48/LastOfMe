@@ -62,7 +62,8 @@ void ARifle::Fire()
 
 		BulletTrans.SetLocation(hitInfo.ImpactPoint);
 
-		UGameplayStatics::SpawnEmitterAtLocation(GetWorld(), BulletEffectFactory, BulletTrans);
+		//  이펙트 사용할 때 켜주기 
+		//UGameplayStatics::SpawnEmitterAtLocation(GetWorld(), BulletEffectFactory, BulletTrans);
 
 		auto hitComp = hitInfo.GetComponent();
 
@@ -76,13 +77,27 @@ void ARifle::Fire()
 
 		}
 
-		auto enemy = hitInfo.GetActor()->GetDefaultSubobjectByName(TEXT("FSM"));
-		if (enemy)
+		auto hitActor = hitInfo.GetActor();
+		if (!hitActor)
+			return;
+
+		// FireFly FSM 검사
+		if (auto fireflyEnemy = hitActor->GetDefaultSubobjectByName(TEXT("FSM")))
 		{
-			auto enemyFSM = Cast<UEnemyFSM>(enemy);
-			enemyFSM->OnDamageProcess(1);
+			if (auto FenemyFSM = Cast<UFireFlyFSM>(fireflyEnemy))
+			{
+				FenemyFSM->OnDamageProcess(1);
+			}
 		}
 
+		// Zombi FSM 검사
+		if (auto zombiEnemy = hitActor->GetDefaultSubobjectByName(TEXT("FSM")))
+		{
+			if (auto ZBenemyFSM = Cast<UEnemyFSM>(zombiEnemy))
+			{
+				ZBenemyFSM->OnDamageProcess(1);
+			}
+		}
 		
 
 	}

@@ -75,6 +75,6 @@ protected:
 	// 블프에 만들어 놓은 것을 가져오는 것 //별론데.. // 둔기에 콜리전 씌우기 // Attack 부분 다시보기
 	class UShapeComponent* BodyCollider;
 
-	UPROPERTY(EditDefaultsOnly, Category = CameraMotion)
-	TSubclassOf<class UCameraShakeBase> CameraShake;
+	//UPROPERTY(EditDefaultsOnly, Category = CameraMotion)
+	//TSubclassOf<class UCameraShakeBase> CameraShake;
 };
