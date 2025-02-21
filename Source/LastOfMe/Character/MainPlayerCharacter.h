@@ -81,14 +81,12 @@ protected:
 	void OnBluntKey   (const FInputActionValue& inputValue);
 	void OnKnifeKey   (const FInputActionValue& inputValue);
 
-
 	void OnChangeActions(EActionState InActionType);
 
+	// 준우가 한다는 곳 
+	void Grab();
+	void FKey();
 
-
-	// ?? 동작을 멈추게 하는 것 카메라 전환이라 나는 필요없음.. 
-	void StrafeOn();
-	void StrafeOff();
 
 	AWeaponBase* GetCurrentAction()
 	{
@@ -130,7 +128,5 @@ public:
 	EActionState NextActionType = EActionState::UNARMED;
 
 	bool bIsAttacking = false; 
-
-	
 };
 

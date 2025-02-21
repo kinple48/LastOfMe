@@ -3,3 +3,7 @@
 
 #include "Weapon/BluntBase.h"
 
+void ABluntBase::Attack()
+{
+
+}

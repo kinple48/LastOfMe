@@ -8,6 +8,10 @@
 #include "Animation/AnimMontage.h"
 #include "../Character/LOMAnimPlayer.h"
 #include "Components/ShapeComponent.h"
+#include "EnemyFSM.h"
+#include "Kismet/GameplayStatics.h"
+#include "FireFly.h"
+#include "Enemy.h"
 
 // Sets default values
 AWeaponBase::AWeaponBase()
@@ -28,6 +32,13 @@ void AWeaponBase::BeginPlay()
 
 	BodyCollider = Cast<UShapeComponent>(GetComponentByClass(UShapeComponent::StaticClass()));
 	//BodyCollider->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+
+	/*AEnemy* enemy = Cast<AEnemy>(OtherActor);
+	if (actor)
+	{
+		fireFly = Cast<AFireFly>(actor);
+	}*/
+
 }
 
 // Called every frame
@@ -63,6 +74,6 @@ void AWeaponBase::Attack()
 
 void AWeaponBase::OnBodyColliderBeginOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
 {
-
+	
 }
 
