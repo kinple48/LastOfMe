@@ -72,7 +72,7 @@ void AMainPlayerCharacter::BeginPlay()
 	Anim = Cast<ULOMAnimPlayer>(GetMesh()->GetAnimInstance());
 
 	// Spawn Weapon 
-			// ¿þÇÂ º£ÀÌ½º·Î ÇØÁà¾ßÇÏ³ª? ¹Ù²ãÁà¾ßÇÏ¸é ¹Ù²ãÁÖ±â ºÎ¸ð·Î ¹Ù²ãÁÜ ÀÚ½ÄÀ¸·Î ¹Ù²Ù´Â°Ô ÇÊ¿äÇÏ¸é ¹Ù²Ù±â 
+	// ¿þÇÂ º£ÀÌ½º·Î ÇØÁà¾ßÇÏ³ª? ¹Ù²ãÁà¾ßÇÏ¸é ¹Ù²ãÁÖ±â ºÎ¸ð·Î ¹Ù²ãÁÜ ÀÚ½ÄÀ¸·Î ¹Ù²Ù´Â°Ô ÇÊ¿äÇÏ¸é ¹Ù²Ù±â 
 	FActorSpawnParameters Param;
 
 	Param.Owner = this;
@@ -117,6 +117,7 @@ void AMainPlayerCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInpu
 		EnhancedInputComponent->BindAction(MyInputCoponent->IA_ChangeWeapon, ETriggerEvent::Started, this, &AMainPlayerCharacter::OnRevolverKey);
 		EnhancedInputComponent->BindAction(MyInputCoponent->IA_ChangeRifle , ETriggerEvent::Started, this, &AMainPlayerCharacter::OnRifleKey);
 		EnhancedInputComponent->BindAction(MyInputCoponent->IA_ChangeBlunt, ETriggerEvent::Started, this, &AMainPlayerCharacter::OnBluntKey);
+		EnhancedInputComponent->BindAction(MyInputCoponent->IA_ChangeKnife, ETriggerEvent::Started, this, &AMainPlayerCharacter::OnKnifeKey);
 
 
 	}
@@ -293,12 +294,18 @@ void AMainPlayerCharacter::OnBluntKey(const FInputActionValue& inputValue)
 
 
 	OnChangeActions(EActionState::BLUNT);
-	// CurActionType = EActionState::BLUNT;
-
-	//auto anim = Cast<ULOMAnimPlayer>(GetMesh()->GetAnimInstance());
-	//anim->EquipWeapon();
-
+	
 	GEngine->AddOnScreenDebugMessage(-1, 3.0f, FColor::Blue, TEXT("BLUNT"));
+}
+
+void AMainPlayerCharacter::OnKnifeKey(const FInputActionValue& inputValue)
+{
+	FString string = inputValue.ToString();
+
+
+	OnChangeActions(EActionState::KNIFE);
+
+	GEngine->AddOnScreenDebugMessage(-1, 3.0f, FColor::Blue, TEXT("OnKnifeKey"));
 }
 
 void AMainPlayerCharacter::OnChangeActions(EActionState InActionType)

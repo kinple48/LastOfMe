@@ -18,8 +18,8 @@
 	 REVOLVER, 
 	 RIFLE   ,
 	 BLUNT   ,
+	 KNIFE   ,
 	 BOW     ,
-	 MELEE   ,
  };
 
 UCLASS()
@@ -79,6 +79,8 @@ protected:
 	void OnRevolverKey(const FInputActionValue& inputValue);
 	void OnRifleKey   (const FInputActionValue& inputValue);
 	void OnBluntKey   (const FInputActionValue& inputValue);
+	void OnKnifeKey   (const FInputActionValue& inputValue);
+
 
 	void OnChangeActions(EActionState InActionType);
 
