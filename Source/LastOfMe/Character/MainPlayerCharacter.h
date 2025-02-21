@@ -83,6 +83,10 @@ protected:
 
 	void OnChangeActions(EActionState InActionType);
 
+	// 준우가 한다는 곳 
+	void Grab();
+	void FKey();
+
 
 	AWeaponBase* GetCurrentAction()
 	{
@@ -124,7 +128,5 @@ public:
 	EActionState NextActionType = EActionState::UNARMED;
 
 	bool bIsAttacking = false; 
-
-	class ARifle* rifle;
 };
 

@@ -62,5 +62,11 @@ public:
 
 	UPROPERTY(EditDefaultsOnly, Category = "Input")
 	class UInputAction* IA_ChangeKnife;
+
+	UPROPERTY(EditDefaultsOnly, Category = "Input")
+	class UInputAction* IA_Grab; // E 
+
+	UPROPERTY(EditDefaultsOnly, Category = "Input")
+	class UInputAction* IA_F; //FF
 };
 

@@ -11,6 +11,7 @@
 #include "Kismet/GameplayStatics.h"
 #include "KismetTraceUtils.h"
 #include "EnemyFSM.h"
+#include "FireFlyFSM.h"
 
 ARifle::ARifle()
 {
@@ -20,6 +21,8 @@ ARifle::ARifle()
 void ARifle::BeginPlay()
 {
 	Super::BeginPlay();
+
+
 }
 
 void ARifle::Tick(float DeltaTime)
@@ -77,9 +80,10 @@ void ARifle::Fire()
 		if (enemy)
 		{
 			auto enemyFSM = Cast<UEnemyFSM>(enemy);
-			enemyFSM->OnDamageProcess(1); 
-
+			enemyFSM->OnDamageProcess(1);
 		}
+
+		
 
 	}
 	

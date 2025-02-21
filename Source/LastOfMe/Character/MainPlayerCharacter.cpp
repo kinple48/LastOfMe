@@ -123,6 +123,9 @@ void AMainPlayerCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInpu
 		EnhancedInputComponent->BindAction(MyInputCoponent->IA_ChangeKnife, ETriggerEvent::Started, this, &AMainPlayerCharacter::OnKnifeKey);
 
 
+		// ÁØ¿ìs 
+		EnhancedInputComponent->BindAction(MyInputCoponent->IA_Grab, ETriggerEvent::Started, this, &AMainPlayerCharacter::Grab);
+		EnhancedInputComponent->BindAction(MyInputCoponent->IA_F   , ETriggerEvent::Started, this, &AMainPlayerCharacter::FKey);
 	}
 }
 
@@ -352,6 +355,14 @@ void AMainPlayerCharacter::OnChangeActions(EActionState InActionType)
 		break;*/
 }
 
+void AMainPlayerCharacter::Grab()
+{
+}
+
+void AMainPlayerCharacter::FKey()
+{
+}
+
 
 void AMainPlayerCharacter::OnAttackBegin()
 {
@@ -396,5 +407,7 @@ void AMainPlayerCharacter::OnSheathActionEnd()
 
 		PlayAnimMontage(GetCurrentAction()->GetDrawMontage());
 	}
+
+	
 }
 
