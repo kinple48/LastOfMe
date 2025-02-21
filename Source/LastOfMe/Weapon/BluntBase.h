@@ -15,6 +15,10 @@ UCLASS()
 class LASTOFME_API ABluntBase : public AWeaponBase
 {
 	GENERATED_BODY()
+
+
+
+	void Attack();
 	
 public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Comp)

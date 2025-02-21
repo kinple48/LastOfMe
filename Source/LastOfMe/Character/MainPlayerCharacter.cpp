@@ -14,6 +14,7 @@
 #include "../Weapon/WeaponBase.h"
 #include "Weapon/BluntBase.h"
 #include "Components/ShapeComponent.h"
+#include "../Weapon/Rifle.h"
 
 
 AMainPlayerCharacter::AMainPlayerCharacter()
@@ -25,6 +26,8 @@ AMainPlayerCharacter::AMainPlayerCharacter()
 
 	playerCam = CreateDefaultSubobject<UCameraComponent>(TEXT("PlayerCam"));
 	playerCam->SetupAttachment(springArm);
+	playerCam->bUsePawnControlRotation = false;
+
 
 	MyInputCoponent = CreateDefaultSubobject<ULOMInputComponent>(TEXT("MyInputComponent"));
 	StateComponent  = CreateDefaultSubobject<UStateComponent>   (TEXT("StateComponent"  ));
@@ -292,7 +295,6 @@ void AMainPlayerCharacter::OnBluntKey(const FInputActionValue& inputValue)
 {
 	FString string = inputValue.ToString();
 
-
 	OnChangeActions(EActionState::BLUNT);
 	
 	GEngine->AddOnScreenDebugMessage(-1, 3.0f, FColor::Blue, TEXT("BLUNT"));
@@ -310,6 +312,7 @@ void AMainPlayerCharacter::OnKnifeKey(const FInputActionValue& inputValue)
 
 void AMainPlayerCharacter::OnChangeActions(EActionState InActionType)
 {
+
 	if (GetCurrentAction() != nullptr)
 	{
 		if (GetMesh()->GetAnimInstance()->Montage_IsPlaying(GetCurrentAction()->GetDrawMontage()))
@@ -352,30 +355,16 @@ void AMainPlayerCharacter::OnChangeActions(EActionState InActionType)
 
 void AMainPlayerCharacter::OnAttackBegin()
 {
-	bIsAttacking = true;
+	StateComponent->bIsAttacking = true;
 
 	//GetCurrentAction()->GetBodyCollider()->SetCollisionEnabled(ECollisionEnabled::QueryAndPhysics); // ÃÑÀÏ ¶§´Â »©±â 
 }
 
 void AMainPlayerCharacter::OnAttackEnd()
 {
-	bIsAttacking = false; 
+	StateComponent->bIsAttacking = false; 
 	//GetCurrentAction()->GetBodyCollider()->SetCollisionEnabled(ECollisionEnabled::NoCollision); // ÃÑÀÏ ¶§´Â »©±â 
 
-}
-
-void AMainPlayerCharacter::StrafeOn()
-{
-	bUseControllerRotationYaw = true;
-
-	GetCharacterMovement()->bOrientRotationToMovement = false;
-}
-
-void AMainPlayerCharacter::StrafeOff()
-{
-	bUseControllerRotationYaw = false;
-
-	GetCharacterMovement()->bOrientRotationToMovement = true;
 }
 
 void AMainPlayerCharacter::OnDrawActionEnd()

@@ -14,9 +14,24 @@ class LASTOFME_API ARifle : public AWeaponBase
 {
 	GENERATED_BODY()
 
+public:
 	ARifle();
 
+protected:
+	virtual void BeginPlay() override;
+
+protected:
+	virtual void Tick(float DeltaTime) override; 
+
 public:
-	
+	void Fire();
+
+	void Attack();
+
+public:
+
+	UPROPERTY(EditAnywhere, Category = BulletEffect)
+	class UParticleSystem* BulletEffectFactory;
+
 
 };

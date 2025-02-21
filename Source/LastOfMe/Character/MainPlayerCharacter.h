@@ -81,14 +81,8 @@ protected:
 	void OnBluntKey   (const FInputActionValue& inputValue);
 	void OnKnifeKey   (const FInputActionValue& inputValue);
 
-
 	void OnChangeActions(EActionState InActionType);
 
-
-
-	// ?? 동작을 멈추게 하는 것 카메라 전환이라 나는 필요없음.. 
-	void StrafeOn();
-	void StrafeOff();
 
 	AWeaponBase* GetCurrentAction()
 	{
@@ -131,6 +125,6 @@ public:
 
 	bool bIsAttacking = false; 
 
-	
+	class ARifle* rifle;
 };
 
