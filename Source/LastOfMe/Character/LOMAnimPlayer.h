@@ -62,4 +62,13 @@ protected:
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	EActionState CurAction;
+
+	UFUNCTION()	
+	void AnimNotify_AttackEnd();
+
+
+	// 안 쓰고 있음 아직 안됌 
+	UFUNCTION()
+	void AnimNotify_AttachRevolver(); 
+
 };

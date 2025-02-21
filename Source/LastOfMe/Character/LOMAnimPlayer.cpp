@@ -6,6 +6,7 @@
 #include "GameFramework/CharacterMovementComponent.h"
 #include "../Component/StateComponent.h"
 
+
 ULOMAnimPlayer::ULOMAnimPlayer()
 {
 }
@@ -34,8 +35,11 @@ void ULOMAnimPlayer::NativeUpdateAnimation(float DeltaSeconds)
 	
 	FRotator BaseRotator = Player->GetActorRotation();
 	CrouchDirection = CalculateDirection(velocity, BaseRotator);
+	
 
 	bIsCrouched = Player->bIsCrouched;	
+
+	CurAction = Player->GetActionType();
 }
 
 void ULOMAnimPlayer::PlayAttackAnim()
@@ -54,4 +58,23 @@ void ULOMAnimPlayer::UnEquipWeapon()
 {
 	if (UnEquipAnimMontage == nullptr) return;
 	Montage_Play(UnEquipAnimMontage);
+}
+
+void ULOMAnimPlayer::AnimNotify_AttackEnd()
+{
+	Player = Cast<AMainPlayerCharacter>(TryGetPawnOwner());
+	if (Player != nullptr)
+	{
+		Player->Anim->AnimNotify_AttackEnd();
+	}
+}
+
+void ULOMAnimPlayer::AnimNotify_AttachRevolver()
+{
+	Player = Cast<AMainPlayerCharacter>(TryGetPawnOwner());
+	if (Player != nullptr)
+	{
+		//Player->Anim->AttachRevolver();
+		Player->OnDrawActionEnd();
+	}
 }

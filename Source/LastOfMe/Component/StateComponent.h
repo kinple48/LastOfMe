@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "Components/ActorComponent.h"
+#include "Animation/AnimInstance.h"
 #include "StateComponent.generated.h"
 
 
@@ -25,10 +26,18 @@ public:
 	virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
 
 public:
+
+	// 빌드업 패턴? 하나씩 빌드가 가능함 자기 자신을 반환
 	
 	UStateComponent* SetIsWalking  (bool IsWalking)  { this->bIsWalking  = IsWalking;  return this; }
 	UStateComponent* SetIsSprint   (bool IsSprint)   { this->bIsSprint   = IsSprint;   return this; }
 	UStateComponent* SetIsCrouched (bool IsCrouched) { this->bIsCrouched = IsCrouched; return this; }
+
+	UStateComponent* SetMaxHP (float   InMaxHP) { this->MaxHP  =  InMaxHP;  return this; }
+	UStateComponent* SetCurHP (float   InCurHP) { this->CurHP  =  InCurHP;  return this; }
+	UStateComponent* SetDamage(int32  InDamage) { this->Damage = InDamage;  return this; }
+
+
 
 public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "boolean")
@@ -54,5 +63,16 @@ public:
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "MoveSpeed")
 	float SprintSpeed = 800.0f;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "State")
+	int32 Damage;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "State")
+	float MaxHP;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "State")
+	float CurHP;
+
+
 		
 };

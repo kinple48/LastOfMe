@@ -13,6 +13,7 @@
 #include "LOMAnimPlayer.h"
 #include "../Weapon/WeaponBase.h"
 #include "Weapon/BluntBase.h"
+#include "Components/ShapeComponent.h"
 
 
 AMainPlayerCharacter::AMainPlayerCharacter()
@@ -48,6 +49,7 @@ AMainPlayerCharacter::AMainPlayerCharacter()
 		GetMesh()->SetAnimInstanceClass(TempAnimInst.Class);
 	}
 
+
 }
 
 void AMainPlayerCharacter::BeginPlay()
@@ -71,14 +73,19 @@ void AMainPlayerCharacter::BeginPlay()
 
 	// Spawn Weapon 
 	// ¿þÇÂ º£ÀÌ½º·Î ÇØÁà¾ßÇÏ³ª? ¹Ù²ãÁà¾ßÇÏ¸é ¹Ù²ãÁÖ±â ºÎ¸ð·Î ¹Ù²ãÁÜ ÀÚ½ÄÀ¸·Î ¹Ù²Ù´Â°Ô ÇÊ¿äÇÏ¸é ¹Ù²Ù±â 
+	FActorSpawnParameters Param;
+
+	Param.Owner = this;
+
 	for (auto& pari : ActionClasses)
 	{
-		AWeaponBase* weapon = GetWorld()->SpawnActor<AWeaponBase>(pari.Value);
+		AWeaponBase* weapon = GetWorld()->SpawnActor<AWeaponBase>(pari.Value, Param);
 
-		weapon->Attach(GetMesh());
+		weapon->AttachToHolster(GetMesh());
 
 		ActionTypes.Add(pari.Key, weapon);
 	}
+
 }
 
 void AMainPlayerCharacter::Tick(float DeltaTime)
@@ -107,10 +114,13 @@ void AMainPlayerCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInpu
 
 		EnhancedInputComponent->BindAction(MyInputCoponent->IA_TEST    , ETriggerEvent::Triggered, this, &AMainPlayerCharacter::TEST        );
 
-		EnhancedInputComponent->BindAction(MyInputCoponent->IA_ChangeWeapon, ETriggerEvent::Started, this, &AMainPlayerCharacter::OnActionKey);
-	}
+		EnhancedInputComponent->BindAction(MyInputCoponent->IA_ChangeWeapon, ETriggerEvent::Started, this, &AMainPlayerCharacter::OnRevolverKey);
+		EnhancedInputComponent->BindAction(MyInputCoponent->IA_ChangeRifle , ETriggerEvent::Started, this, &AMainPlayerCharacter::OnRifleKey);
+		EnhancedInputComponent->BindAction(MyInputCoponent->IA_ChangeBlunt, ETriggerEvent::Started, this, &AMainPlayerCharacter::OnBluntKey);
+		EnhancedInputComponent->BindAction(MyInputCoponent->IA_ChangeKnife, ETriggerEvent::Started, this, &AMainPlayerCharacter::OnKnifeKey);
 
-	
+
+	}
 }
 
 void AMainPlayerCharacter::LookUp(const FInputActionValue& inputValue)
@@ -144,9 +154,7 @@ void AMainPlayerCharacter::Move(const FInputActionValue& inputValue)
 		AddMovementInput(ForwardDirection, MovementVector.X);
 		AddMovementInput(RightDirection  , MovementVector.Y);
 	}
-
 }
-
 
 void AMainPlayerCharacter::SlowMove(const FInputActionValue& inputValue)
 {
@@ -209,9 +217,41 @@ void AMainPlayerCharacter::CrouchStart(const FInputActionValue& inputValue)
 
 void AMainPlayerCharacter::AttackAction(const FInputActionValue& inputValue)
 {
-	auto anim = Cast<ULOMAnimPlayer>(GetMesh()->GetAnimInstance());
-	anim->PlayAttackAnim();
-	GEngine->AddOnScreenDebugMessage(-1, 3.0f, FColor::Blue, TEXT("Attack!!!!!"));
+	if (bIsAttacking)
+		return;
+
+	switch (CurActionType)
+	{
+	case EActionState::UNARMED:
+		break;
+	default:
+		GetCurrentAction()->Attack();
+		break;
+	}
+
+	/*switch (CurActionType)
+	{
+	case EActionState::UNARMED:
+		auto anim = Cast<ULOMAnimPlayer>(GetMesh()->GetAnimInstance());
+		anim->PlayAttackAnim();
+		GEngine->AddOnScreenDebugMessage(-1, 3.0f, FColor::Blue, TEXT("Attack!!!!!"));
+		break;
+	case EActionState::REVOLVER:
+		break;
+	case EActionState::RIFLE:
+		break;
+	case EActionState::BLUNT:
+		break;
+	case EActionState::BOW:
+		break;
+	case EActionState::MELEE:
+
+		break;
+		default:
+		break;
+	}*/
+
+	
 }
 
 void AMainPlayerCharacter::TEST(const FInputActionValue& inputValue)
@@ -220,7 +260,7 @@ void AMainPlayerCharacter::TEST(const FInputActionValue& inputValue)
 	GEngine->AddOnScreenDebugMessage(-1, 3.0f, FColor::Blue, TEXT("enemysound!!!!!"));
 }
 
-void AMainPlayerCharacter::OnActionKey(const FInputActionValue& inputValue)
+void AMainPlayerCharacter::OnRevolverKey(const FInputActionValue& inputValue)
 {
 	FString string = inputValue.ToString();
 
@@ -228,25 +268,100 @@ void AMainPlayerCharacter::OnActionKey(const FInputActionValue& inputValue)
 	OnChangeActions(EActionState::REVOLVER);
 	// CurActionType = EActionState::BLUNT;
 
-	auto anim = Cast<ULOMAnimPlayer>(GetMesh()->GetAnimInstance());
-	anim->EquipWeapon();
-	 
-	 
-	 GEngine->AddOnScreenDebugMessage(-1, 3.0f, FColor::Blue, TEXT("OnActionKey"));
+	//auto anim = Cast<ULOMAnimPlayer>(GetMesh()->GetAnimInstance());
+	//anim->EquipWeapon();
+
+	GEngine->AddOnScreenDebugMessage(-1, 3.0f, FColor::Blue, TEXT("OnRevolverKey"));
+}
+
+void AMainPlayerCharacter::OnRifleKey(const FInputActionValue& inputValue)
+{
+	FString string = inputValue.ToString();
+
+
+	OnChangeActions(EActionState::RIFLE);
+	// CurActionType = EActionState::BLUNT;
+
+	//auto anim = Cast<ULOMAnimPlayer>(GetMesh()->GetAnimInstance());
+	//anim->EquipWeapon();
+
+	GEngine->AddOnScreenDebugMessage(-1, 3.0f, FColor::Blue, TEXT("RIFLE"));
+}
+
+void AMainPlayerCharacter::OnBluntKey(const FInputActionValue& inputValue)
+{
+	FString string = inputValue.ToString();
+
+
+	OnChangeActions(EActionState::BLUNT);
+	
+	GEngine->AddOnScreenDebugMessage(-1, 3.0f, FColor::Blue, TEXT("BLUNT"));
+}
+
+void AMainPlayerCharacter::OnKnifeKey(const FInputActionValue& inputValue)
+{
+	FString string = inputValue.ToString();
+
+
+	OnChangeActions(EActionState::KNIFE);
+
+	GEngine->AddOnScreenDebugMessage(-1, 3.0f, FColor::Blue, TEXT("OnKnifeKey"));
 }
 
 void AMainPlayerCharacter::OnChangeActions(EActionState InActionType)
 {
+	if (GetCurrentAction() != nullptr)
+	{
+		if (GetMesh()->GetAnimInstance()->Montage_IsPlaying(GetCurrentAction()->GetDrawMontage()))
+			return;
+		if (GetMesh()->GetAnimInstance()->Montage_IsPlaying(GetCurrentAction()->GetSheathMontage()))
+			return;
+	}
 	
-	if (InActionType == CurActionType)
-		return;
-
 	//ChangeWeapon
+	 switch (CurActionType)
+	 {
+	 case EActionState::UNARMED:
+		  CurActionType = InActionType;
+		 NextActionType = InActionType;
+		 PlayAnimMontage(GetCurrentAction()->GetDrawMontage());
+		 break;
+	 default:
+		 PlayAnimMontage(GetCurrentAction()->GetSheathMontage());
 
-	LastActionType = CurActionType;
-     CurActionType =  InActionType;
+		 if (CurActionType != InActionType)
+			 NextActionType = InActionType;
 
-	OnChangeActionEnd();
+		 break;
+	 }
+
+	/*case EActionState::REVOLVER:
+		CurActionType = InActionType;
+		PlayAnimMontage(GetCurrentAction()->GetDrawMontage());
+		break;
+	case EActionState::RIFLE:
+		break;
+	case EActionState::BOW:
+		break;
+	case EActionState::MELEE:
+		break;
+	case EActionState::BLUNT:
+		break;*/
+}
+
+
+void AMainPlayerCharacter::OnAttackBegin()
+{
+	bIsAttacking = true;
+
+	//GetCurrentAction()->GetBodyCollider()->SetCollisionEnabled(ECollisionEnabled::QueryAndPhysics); // ÃÑÀÏ ¶§´Â »©±â 
+}
+
+void AMainPlayerCharacter::OnAttackEnd()
+{
+	bIsAttacking = false; 
+	//GetCurrentAction()->GetBodyCollider()->SetCollisionEnabled(ECollisionEnabled::NoCollision); // ÃÑÀÏ ¶§´Â »©±â 
+
 }
 
 void AMainPlayerCharacter::StrafeOn()
@@ -263,11 +378,34 @@ void AMainPlayerCharacter::StrafeOff()
 	GetCharacterMovement()->bOrientRotationToMovement = true;
 }
 
-void AMainPlayerCharacter::OnChangeActionEnd()
+void AMainPlayerCharacter::OnDrawActionEnd()
 {
-	if (CurActionType == EActionState::UNARMED)
-		StrafeOff();
+	ActionTypes[NextActionType]->AttachToHand(GetMesh());
+
+	NextActionType = EActionState::UNARMED;
+
+	//if (CurActionType == EActionState::UNARMED)
+	//	StrafeOff();
+	//else
+	//	StrafeOn();
+	
+}
+
+void AMainPlayerCharacter::OnSheathActionEnd()
+{
+	GetCurrentAction()->AttachToHolster(GetMesh());
+
+	if (NextActionType == EActionState::UNARMED)
+	{
+	    CurActionType = EActionState::UNARMED;
+		//StrafeOff();
+	}
+
 	else
-		StrafeOn();
+	{
+		CurActionType = NextActionType;
+
+		PlayAnimMontage(GetCurrentAction()->GetDrawMontage());
+	}
 }
 
