@@ -5,18 +5,12 @@
 #include "Enemy.h"
 #include "EnemyFSM.h"
 
-void UEnemyAnimInstance::NativeUpdateAnimation(float DeltaSeconds)
+void UEnemyAnimInstance::AnimNotify_AttackEnd()
 {
-	Super::NativeUpdateAnimation(DeltaSeconds);
-	AEnemy* enemy = Cast<AEnemy>(TryGetPawnOwner());
-	if (!enemy) return;
-	FVector velocity = enemy->GetVelocity();
-	FVector forwardvector = enemy->GetActorForwardVector();
-	Speed = FVector::DotProduct(velocity, forwardvector);
-	Attackstate = enemy->FSM->attackstate;
-	Bitestate = enemy->FSM->bitestate;
-	Walkstate = enemy->FSM->walkstate;
-	Runstate = enemy->FSM->runstate;
+	if (AEnemy* enemy = Cast<AEnemy>(TryGetPawnOwner()))
+	{
+		enemy->FSM->OnAttackEnd();
+	}
 }
 
 void UEnemyAnimInstance::AnimNotify_PunchStart()

@@ -15,6 +15,7 @@
 #include "NavigationSystem.h"
 #include "EnemyAnimInstance.h"
 #include "Components/SphereComponent.h"
+#include "Animation/AnimMontage.h"
 
 UEnemyFSM::UEnemyFSM()
 {
@@ -31,17 +32,20 @@ void UEnemyFSM::BeginPlay()
 	}
 	me = Cast<AEnemy>(GetOwner());
 
-	speed = me->GetCharacterMovement()->MaxWalkSpeed;
-
 	ai = Cast<AAIsight>(me->GetController());
+
+	if (me)
+	{
+		Anim = Cast<UEnemyAnimInstance>(me->GetMesh()->GetAnimInstance());
+	}
 }
 
 void UEnemyFSM::TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction)
 {
 	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
 
-	//FString logMsg = UEnum::GetValueAsString(mState);
-	//GEngine->AddOnScreenDebugMessage(0, 1.0f, FColor::Red, logMsg);
+	FString logMsg = UEnum::GetValueAsString(mState);
+	GEngine->AddOnScreenDebugMessage(0, 1.0f, FColor::Red, logMsg);
 
 	switch (mState)
 	{
@@ -56,13 +60,20 @@ void UEnemyFSM::TickComponent(float DeltaTime, ELevelTick TickType, FActorCompon
 
 }
 
+void UEnemyFSM::OnAttackEnd()
+{
+	Anim->bAttackPlay = false;
+}
+
 void UEnemyFSM::IdleState()
 {
 	CurrentTime += GetWorld()->GetDeltaSeconds();
 	if (CurrentTime >= IdleTime)
 	{
+		GetRandomPositionInNavMesh(me->GetActorLocation(), 500.f, randomPos);
 		mState = EEnemyState::Patrol;
 		CurrentTime = 0.f;
+		Anim->AnimState = mState;
 	}
 }
 
@@ -96,29 +107,27 @@ void UEnemyFSM::MoveState()
 		{
 			ai->StopMovement();
 			mState = EEnemyState::Attack;
-			//Anim->AnimState = mState;
-			//Anim->bAttackPlay = true;
+			Anim->AnimState = mState;
+			Anim->bAttackPlay = true;
 			CurrentTime = attackDelayTime;
-			
 		}
 	}
-	else
+	/*else
 	{
-		
+
 		me->GetCharacterMovement()->MaxWalkSpeed = 100;
 		auto result = ai->MoveToLocation(randomPos);
 		if (result == EPathFollowingRequestResult::AlreadyAtGoal)
 		{
 			GetRandomPositionInNavMesh(me->GetActorLocation(), 500.f, randomPos);
 		}
-	}
+	}*/
 
 }
 
 void UEnemyFSM::AttackState()
 {
 	me->GetCharacterMovement()->MaxWalkSpeed = 0;
-	runstate = false;
 	FVector destination = target->GetActorLocation();
 	FVector dir = destination - me->GetActorLocation();
 
@@ -131,15 +140,16 @@ void UEnemyFSM::AttackState()
 	CurrentTime += GetWorld()->GetDeltaSeconds();
 	if (CurrentTime >= attackDelayTime)
 	{
-		attackstate = true;
 		CurrentTime = 0.f;
+		Anim->bAttackPlay = true;
 	}
 
 
 	if (dir.Size() > AttackRange)
 	{
 		mState = EEnemyState::Move;
-		attackstate = false;
+		Anim->AnimState = mState;
+		CurrentTime = 0;
 	}
 }
 
@@ -161,7 +171,6 @@ void UEnemyFSM::DieState()
 
 void UEnemyFSM::BiteState()
 {
-	bitestate = true;
 }
 
 void UEnemyFSM::PatrolState()
@@ -201,9 +210,13 @@ void UEnemyFSM::OnDamageProcess(int32 damage)
 	if (hp > 0)
 	{
 		mState = EEnemyState::Damage;
+		int32 randValue = FMath::RandRange(0, 1);
+		FString sectionName = FString::Printf(TEXT("Damage%d"), randValue);
+		me->PlayAnimMontage(Anim->EnemyMontage, 1.f, FName(*sectionName));
 	}
 	else
 	{
 		mState = EEnemyState::Die;
+		me->PlayAnimMontage(Anim->EnemyMontage, 1.f, TEXT("Die"));
 	}
 }

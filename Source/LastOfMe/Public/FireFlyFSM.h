@@ -62,7 +62,8 @@ public:
 	float CurrentTime = 0.f;
 	float IdleDelayTime = 2.f;
 	float RangedAttackRange = 700.f;
-	float MeleeAttackRange = 200.f;
+	UPROPERTY(EditAnywhere)
+	float MeleeAttackRange = 150.f;
 	float attackDelayTime = 3.f;
 
 
@@ -79,11 +80,11 @@ public:
 	void DrawGun2();
 	void GunShot();
 
-	//void Punch_R_Start();
-	//void Punch_R_End();
-
 	void Punch_R_Start();
 	void Punch_R_End();
+
+	void Punch_L_Start();
+	void Punch_L_End();
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = FSM)
 	int32 hp = 4;

@@ -40,7 +40,6 @@ void AAIController_Clicker::PerceptionUpdated(const TArray<AActor*>& UpdatedActo
 			{
 				GEngine->AddOnScreenDebugMessage(-1, 3.0f, FColor::Black, TEXT("hello"));
 				class AEnemy* enemy = Cast<AEnemy>(GetCharacter());
-				enemy->FindComponentByClass<UEnemyFSM>()->runstate = true;
 				enemy->FindComponentByClass<UEnemyFSM>()->mState = EEnemyState::Move;
 			}
 

@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "Components/ActorComponent.h"
+#include "../Character/MainPlayerCharacter.h"
 #include "EnemyFSM.generated.h"
 
 UENUM(BlueprintType)
@@ -39,7 +40,12 @@ public:
 	class AMainPlayerCharacter* target;
 
 	UPROPERTY()
+	class UEnemyAnimInstance* Anim;
+
+	UPROPERTY()
 	class AEnemy* me;
+
+	void OnAttackEnd();
 
 	void IdleState();
 
@@ -61,23 +67,10 @@ public:
 	UPROPERTY(EditAnywhere, Category = FSM)
 	float AttackRange = 150.0f;
 
-	UPROPERTY(EditAnywhere,BlueprintReadWrite)
-	float speed = 0.f;
-
-	UPROPERTY(EditAnywhere,BlueprintReadWrite)
-	bool attackstate = false;
-	UPROPERTY(EditAnywhere,BlueprintReadWrite)
-	bool bitestate = false;
-	UPROPERTY(EditAnywhere,BlueprintReadWrite)
-	bool walkstate = false;
-	UPROPERTY(EditAnywhere,BlueprintReadWrite)
-	bool runstate = false;
-
 	UPROPERTY(EditAnywhere, Category = FSM)
 	float damageDelayTime = 2.f;
 	float attackDelayTime = 2.f;
 	float CurrentTime = 0.f;
-	//float BiteTime = 5.0f;
 	float IdleTime = 2.0f;
 
 	UPROPERTY()

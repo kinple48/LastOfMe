@@ -52,8 +52,8 @@ void UFireFlyFSM::TickComponent(float DeltaTime, ELevelTick TickType, FActorComp
 {
 	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
 
-	FString logMsg = UEnum::GetValueAsString(mState);
-	GEngine->AddOnScreenDebugMessage(0, 1.0f, FColor::Red, logMsg);
+	//FString logMsg = UEnum::GetValueAsString(mState);
+	//GEngine->AddOnScreenDebugMessage(0, 1.0f, FColor::Red, logMsg);
 
 	switch (mState)
 	{
@@ -73,7 +73,6 @@ void UFireFlyFSM::IdleState()
 	if (CurrentTime >= IdleDelayTime)
 	{
 		GetRandomPositionInNavMesh(me->GetActorLocation(), 500.f, randomPos);
-		//mState = EFireFlyState::Move;
 		mState = EFireFlyState::Patrol;
 		CurrentTime = 0.f;
 		Anim->AnimState = mState;
@@ -149,6 +148,7 @@ void UFireFlyFSM::RangedAttackState()
 
 	if (distance <= MeleeAttackRange)
 	{
+		ai->StopMovement();
 		mState = EFireFlyState::MeleeAttack;
 		Anim->AnimState = mState;
 		Anim->bAttackPlay = true;
@@ -254,7 +254,10 @@ void UFireFlyFSM::GunShot()
 
 	if (bHit)
 	{
-		GEngine->AddOnScreenDebugMessage(-1, 3.0f, FColor::Black, TEXT("On Hit"));
+		if (target)
+		{
+			GEngine->AddOnScreenDebugMessage(-1, 3.0f, FColor::Black, TEXT("On Hit"));
+		}
 	}
 
 	FHitResult hitResult;
@@ -263,7 +266,7 @@ void UFireFlyFSM::GunShot()
 
 void UFireFlyFSM::Punch_R_Start()
 {
-	me->spherecomp_r->SetCollisionEnabled(ECollisionEnabled::QueryAndPhysics);
+	me->spherecomp_r->SetCollisionEnabled(ECollisionEnabled::QueryOnly);
 	me->isDamaged = false;
 }
 
@@ -273,16 +276,32 @@ void UFireFlyFSM::Punch_R_End()
 	me->isDamaged = true;
 }
 
+void UFireFlyFSM::Punch_L_Start()
+{
+	me->spherecomp_l ->SetCollisionEnabled(ECollisionEnabled::QueryOnly);
+	me->isDamaged = false;
+}
+
+void UFireFlyFSM::Punch_L_End()
+{
+	me->spherecomp_l->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+	me->isDamaged = true;
+}
+
 void UFireFlyFSM::OnDamageProcess(int32 damage)
 {
 	hp -= damage;
 	if (hp > 0)
 	{
 		mState = EFireFlyState::Damage;
+
+		int32 randValue = FMath::RandRange(0, 1);
+		FString sectionName = FString::Printf(TEXT("Damage%d"), randValue);
+		me->PlayAnimMontage(Anim->FireFlyMontage, 1.f, FName(*sectionName));
 	}
 	else
 	{
 		mState = EFireFlyState::Die;
+		me->PlayAnimMontage(Anim->FireFlyMontage, 1.f, TEXT("Die"));
 	}
 }
-

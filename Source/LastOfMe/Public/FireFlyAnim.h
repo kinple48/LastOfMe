@@ -5,6 +5,7 @@
 #include "CoreMinimal.h"
 #include "Animation/AnimInstance.h"
 #include "FireFlyFSM.h"
+#include "Animation/AnimMontage.h"
 #include "FireFlyAnim.generated.h"
 
 /**
@@ -39,4 +40,15 @@ public:
 
 	UFUNCTION()
 	void AnimNotify_Punch_R_End();
+
+	UFUNCTION()
+	void AnimNotify_Punch_L_Start();
+
+	UFUNCTION()
+	void AnimNotify_Punch_L_End();
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = FSM)
+	class UAnimMontage* FireFlyMontage;
+
+
 };

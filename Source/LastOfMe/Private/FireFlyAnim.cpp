@@ -1,4 +1,4 @@
-// Fill out your copyright notice in the Description page of Project Settings.
+  // Fill out your copyright notice in the Description page of Project Settings.
 
 
 #include "FireFlyAnim.h"
@@ -50,5 +50,21 @@ void UFireFlyAnim::AnimNotify_Punch_R_End()
 	if (AFireFly* firefly = Cast<AFireFly>(TryGetPawnOwner()))
 	{
 		firefly->FSM->Punch_R_End();
+	}
+}
+
+void UFireFlyAnim::AnimNotify_Punch_L_Start()
+{
+	if (AFireFly* firefly = Cast<AFireFly>(TryGetPawnOwner()))
+	{
+		firefly->FSM->Punch_L_Start();
+	}
+}
+
+void UFireFlyAnim::AnimNotify_Punch_L_End()
+{
+	if (AFireFly* firefly = Cast<AFireFly>(TryGetPawnOwner()))
+	{
+		firefly->FSM->Punch_L_End();
 	}
 }

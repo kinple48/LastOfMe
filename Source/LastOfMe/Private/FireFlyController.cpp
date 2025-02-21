@@ -10,6 +10,7 @@
 #include "FireFly.h"
 #include "Kismet/GameplayStatics.h"
 #include "../Character/MainPlayerCharacter.h"
+#include "FireFlyAnim.h"
 
 
 AFireFlyController::AFireFlyController()
@@ -48,7 +49,6 @@ AFireFlyController::AFireFlyController()
 
 }
 
-
 void AFireFlyController::PerceptionUpdated(const TArray<AActor*>& UpdatedActors)
 {
 	for (AActor* UpdatedActor : UpdatedActors)
@@ -60,6 +60,7 @@ void AFireFlyController::PerceptionUpdated(const TArray<AActor*>& UpdatedActors)
 				GEngine->AddOnScreenDebugMessage(-1, 3.0f, FColor::Black, TEXT("hello"));
 				class AFireFly* firefly = Cast<AFireFly>(GetCharacter());
 				firefly->FindComponentByClass<UFireFlyFSM>()->mState = EFireFlyState::Move;
+				firefly->FindComponentByClass<UFireFlyFSM>()->Anim->AnimState = EFireFlyState::Move;
 			}
 		}
 	}

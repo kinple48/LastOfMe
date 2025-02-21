@@ -8,6 +8,7 @@
 #include "Enemy.h"
 #include "EnemyFSM.h"
 #include "Perception/AISenseConfig_Hearing.h"
+#include "EnemyAnimInstance.h"
 
 AAIsight::AAIsight()
 {
@@ -43,6 +44,7 @@ AAIsight::AAIsight()
 
 	AIPerception->OnPerceptionUpdated.AddDynamic(this, &AAIsight::PerceptionUpdated);
 }
+
 void AAIsight::PerceptionUpdated(const TArray<AActor*>& UpdatedActors)
 {
 	for (AActor* UpdatedActor : UpdatedActors)
@@ -53,8 +55,8 @@ void AAIsight::PerceptionUpdated(const TArray<AActor*>& UpdatedActors)
 			{
 				GEngine->AddOnScreenDebugMessage(-1, 3.0f, FColor::Black, TEXT("hello"));
 				class AEnemy* enemy = Cast<AEnemy>(GetCharacter());
-				enemy->FindComponentByClass<UEnemyFSM>()->runstate = true;
 				enemy->FindComponentByClass<UEnemyFSM>()->mState = EEnemyState::Move;
+				enemy->FindComponentByClass<UEnemyFSM>()->Anim->AnimState = EEnemyState::Move;
 			}
 		}
 	}

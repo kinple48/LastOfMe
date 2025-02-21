@@ -19,17 +19,19 @@ AFireFly::AFireFly()
 	spherecomp_r->SetupAttachment(GetMesh(), TEXT("hand_rSocket"));
 	spherecomp_r->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 	spherecomp_r->SetSphereRadius(150.f);
-	
 
-
+	spherecomp_l = CreateDefaultSubobject<USphereComponent>(TEXT("spherecomp_l"));
+	spherecomp_l->SetupAttachment(GetMesh(), TEXT("hand_lSocket"));
+	spherecomp_l->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+	spherecomp_l->SetSphereRadius(150.f);
 }
 
 // Called when the game starts or when spawned
 void AFireFly::BeginPlay()
 {
 	Super::BeginPlay();
+	spherecomp_l->OnComponentBeginOverlap.AddDynamic(this, &AFireFly::OnSphereLoverlap);
 	spherecomp_r->OnComponentBeginOverlap.AddDynamic(this, &AFireFly::OnSphereRoverlap);
-	
 }
 
 // Called every frame
@@ -43,14 +45,22 @@ void AFireFly::Tick(float DeltaTime)
 void AFireFly::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
 {
 	Super::SetupPlayerInputComponent(PlayerInputComponent);
-
 }
 
 void AFireFly::OnSphereRoverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
 {
 	if (isDamaged)
 	{
-		GEngine->AddOnScreenDebugMessage(-1, 3.f, FColor::Emerald, TEXT("damaged"));
+		GEngine->AddOnScreenDebugMessage(-1, 3.f, FColor::Emerald, TEXT("damaged_R"));
+		isDamaged = false;
+	}
+}
+
+void AFireFly::OnSphereLoverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
+{
+	if (isDamaged)
+	{
+		GEngine->AddOnScreenDebugMessage(-1, 3.f, FColor::Emerald, TEXT("damaged_L"));
 		isDamaged = false;
 	}
 }
