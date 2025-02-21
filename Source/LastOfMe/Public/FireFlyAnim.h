@@ -21,10 +21,22 @@ public:
 	
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category=FSM)
 	bool bAttackPlay;
-	bool AttackStart;
+
 	UFUNCTION()
 	void AnimNotify_AttackEnd();
 
 	UFUNCTION()
-	void AnimNotify_attackStart();
+	void AnimNotify_gundraw();
+
+	UFUNCTION()
+	void AnimNotify_drawgun2();
+
+	UFUNCTION()
+	void AnimNotify_GunShot();
+
+	UFUNCTION()
+	void AnimNotify_Punch_R_Start();
+
+	UFUNCTION()
+	void AnimNotify_Punch_R_End();
 };

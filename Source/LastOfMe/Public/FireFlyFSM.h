@@ -14,7 +14,8 @@ enum class EFireFlyState : uint8
 	RangedAttack ,
 	MeleeAttack ,
 	Damage ,
-	Die
+	Die ,
+	Patrol
 };
 
 UCLASS( ClassGroup=(Custom), meta=(BlueprintSpawnableComponent) )
@@ -56,11 +57,13 @@ public:
 
 	void DieState();
 
+	void PatrolState();
+
 	float CurrentTime = 0.f;
 	float IdleDelayTime = 2.f;
-	float RangedAttackRange = 600.f;
+	float RangedAttackRange = 700.f;
 	float MeleeAttackRange = 200.f;
-	float attackDelayTime = 2.f;
+	float attackDelayTime = 3.f;
 
 
 	UPROPERTY()
@@ -72,5 +75,18 @@ public:
 	class UFireFlyAnim* Anim;
 
 	void OnAttackEnd();
-	void OnAttackStart();
+	void DrawGun();
+	void DrawGun2();
+	void GunShot();
+
+	//void Punch_R_Start();
+	//void Punch_R_End();
+
+	void Punch_R_Start();
+	void Punch_R_End();
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = FSM)
+	int32 hp = 4;
+
+	void OnDamageProcess(int32 damage);
 };

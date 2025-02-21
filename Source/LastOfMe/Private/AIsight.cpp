@@ -55,9 +55,7 @@ void AAIsight::PerceptionUpdated(const TArray<AActor*>& UpdatedActors)
 				class AEnemy* enemy = Cast<AEnemy>(GetCharacter());
 				enemy->FindComponentByClass<UEnemyFSM>()->runstate = true;
 				enemy->FindComponentByClass<UEnemyFSM>()->mState = EEnemyState::Move;
-
 			}
-
 		}
 	}
 }

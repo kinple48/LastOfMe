@@ -32,9 +32,12 @@ public:
 	class UEnemyFSM* FSM;
 
 	float CurrentTime = 0.f;
-	float NoiseTime = 10.f;
 
-	UPROPERTY(EditAnywhere,BlueprintReadWrite)
-	class ASpline* splineactor;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	class USphereComponent* spherecomp_r;
 	
+	UFUNCTION()
+	void OnSpherecomp_rBeginoverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult);
+
+	bool isDamaged = true;
 };

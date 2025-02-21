@@ -30,5 +30,10 @@ public:
 	UPROPERTY(EditAnywhere,BlueprintReadWrite,Category=EnemyAnimInstance)
 	bool Runstate = false;
 
+	UFUNCTION()
+	void AnimNotify_PunchStart();
+
+	UFUNCTION()
+	void AnimNotify_PunchEnd();
 };
 

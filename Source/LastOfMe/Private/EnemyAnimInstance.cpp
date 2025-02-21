@@ -19,3 +19,19 @@ void UEnemyAnimInstance::NativeUpdateAnimation(float DeltaSeconds)
 	Runstate = enemy->FSM->runstate;
 }
 
+void UEnemyAnimInstance::AnimNotify_PunchStart()
+{
+	if (AEnemy* enemy = Cast<AEnemy>(TryGetPawnOwner()))
+	{
+		enemy->FSM->PunchStart();
+	}
+}
+
+void UEnemyAnimInstance::AnimNotify_PunchEnd()
+{
+	if (AEnemy* enemy = Cast<AEnemy>(TryGetPawnOwner()))
+	{
+		enemy->FSM->PunchEnd();
+	}
+}
+

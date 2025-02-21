@@ -24,15 +24,12 @@ class LASTOFME_API UEnemyFSM : public UActorComponent
 	GENERATED_BODY()
 
 public:	
-	// Sets default values for this component's properties
 	UEnemyFSM();
 
 protected:
-	// Called when the game starts
 	virtual void BeginPlay() override;
 
 public:	
-	// Called every frame
 	virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = FSM)
@@ -76,11 +73,23 @@ public:
 	UPROPERTY(EditAnywhere,BlueprintReadWrite)
 	bool runstate = false;
 
-
+	UPROPERTY(EditAnywhere, Category = FSM)
+	float damageDelayTime = 2.f;
+	float attackDelayTime = 2.f;
 	float CurrentTime = 0.f;
-	float BiteTime = 5.0f;
+	//float BiteTime = 5.0f;
 	float IdleTime = 2.0f;
 
-	void EnterPatrolState();
+	UPROPERTY()
+	class AAIsight* ai;
+	FVector randomPos;
+	bool GetRandomPositionInNavMesh(FVector centerLocation, float radius, FVector& dest);
 
+	void PunchStart();
+	void PunchEnd();
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = FSM)
+	int32 hp = 4;
+
+	void OnDamageProcess(int32 damage);
 };

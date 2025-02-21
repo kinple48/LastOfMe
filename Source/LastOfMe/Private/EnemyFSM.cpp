@@ -12,35 +12,30 @@
 #include "GameFramework/CharacterMovementComponent.h"
 #include "Spline.h"
 #include "Navigation/PathFollowingComponent.h"
+#include "NavigationSystem.h"
+#include "EnemyAnimInstance.h"
+#include "Components/SphereComponent.h"
 
-// Sets default values for this component's properties
 UEnemyFSM::UEnemyFSM()
 {
-	// Set this component to be initialized when the game starts, and to be ticked every frame.  You can turn these features
-	// off to improve performance if you don't need them.
 	PrimaryComponentTick.bCanEverTick = true;
-
-	// ...
 }
 
-// Called when the game starts
 void UEnemyFSM::BeginPlay()
 {
 	Super::BeginPlay();
-	// ...
 	AActor* actor = UGameplayStatics::GetActorOfClass(GetWorld(), AMainPlayerCharacter::StaticClass());
 	if (actor)
 	{
 		target = Cast<AMainPlayerCharacter>(actor);
 	}
-
 	me = Cast<AEnemy>(GetOwner());
 
 	speed = me->GetCharacterMovement()->MaxWalkSpeed;
+
+	ai = Cast<AAIsight>(me->GetController());
 }
 
-
-// Called every frame
 void UEnemyFSM::TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction)
 {
 	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
@@ -67,34 +62,55 @@ void UEnemyFSM::IdleState()
 	if (CurrentTime >= IdleTime)
 	{
 		mState = EEnemyState::Patrol;
-		EnterPatrolState();
 		CurrentTime = 0.f;
 	}
 }
 
 void UEnemyFSM::MoveState()
 {
-	walkstate = false;
-	runstate = true;
 	if (!target || !me) return;
 	FVector destination = target->GetActorLocation();
 	FVector dir = destination - me->GetActorLocation();
 
 	FRotator newRotation = dir.Rotation();
-
-	newRotation = UKismetMathLibrary::MakeRotFromXZ(dir,me->GetActorUpVector());
-
-	newRotation = FMath::RInterpTo(me->GetActorRotation(), newRotation, GetWorld()->GetDeltaSeconds(), 0.2f);
-
+	newRotation = UKismetMathLibrary::MakeRotFromXZ(dir, me->GetActorUpVector());
+	newRotation = FMath::RInterpTo(me->GetActorRotation(), newRotation, GetWorld()->GetDeltaSeconds(), 1.5f);
 	me->SetActorRotation(newRotation);
 
-	me->AddMovementInput(dir);
-	me->GetCharacterMovement()->MaxWalkSpeed = 600;
+	auto ns = UNavigationSystemV1::GetNavigationSystem(GetWorld());
 
-	if (dir.Size() <= AttackRange)
+	FPathFindingQuery query;
+	FAIMoveRequest req;
+
+	req.SetAcceptanceRadius(3);
+	req.SetGoalLocation(destination);
+
+	ai->BuildPathfindingQuery(req, query);
+	FPathFindingResult r = ns->FindPathSync(query);
+
+	if (r.Result == ENavigationQueryResult::Success)
 	{
-		mState = EEnemyState::Attack;
-		CurrentTime = 0.f;
+		me->GetCharacterMovement()->MaxWalkSpeed = 600;
+		ai->MoveToLocation(destination);
+		if (dir.Size() < AttackRange)
+		{
+			ai->StopMovement();
+			mState = EEnemyState::Attack;
+			//Anim->AnimState = mState;
+			//Anim->bAttackPlay = true;
+			CurrentTime = attackDelayTime;
+			
+		}
+	}
+	else
+	{
+		
+		me->GetCharacterMovement()->MaxWalkSpeed = 100;
+		auto result = ai->MoveToLocation(randomPos);
+		if (result == EPathFollowingRequestResult::AlreadyAtGoal)
+		{
+			GetRandomPositionInNavMesh(me->GetActorLocation(), 500.f, randomPos);
+		}
 	}
 
 }
@@ -102,18 +118,20 @@ void UEnemyFSM::MoveState()
 void UEnemyFSM::AttackState()
 {
 	me->GetCharacterMovement()->MaxWalkSpeed = 0;
-	attackstate = true;
 	runstate = false;
 	FVector destination = target->GetActorLocation();
 	FVector dir = destination - me->GetActorLocation();
 
-	me->SetActorRotation(UKismetMathLibrary::MakeRotFromXZ(dir,me->GetActorUpVector()));
+	FRotator newRotation = dir.Rotation();
+	newRotation = UKismetMathLibrary::MakeRotFromXZ(dir, me->GetActorUpVector());
+	newRotation = FMath::RInterpTo(me->GetActorRotation(), newRotation, GetWorld()->GetDeltaSeconds(), 0.2f);
+	me->SetActorRotation(newRotation);
 
 
 	CurrentTime += GetWorld()->GetDeltaSeconds();
-	if (CurrentTime >= BiteTime)
+	if (CurrentTime >= attackDelayTime)
 	{
-		mState = EEnemyState::Bite;
+		attackstate = true;
 		CurrentTime = 0.f;
 	}
 
@@ -127,7 +145,13 @@ void UEnemyFSM::AttackState()
 
 void UEnemyFSM::DamageState()
 {
-
+	
+	CurrentTime += GetWorld()->DeltaTimeSeconds;
+	if (CurrentTime >= damageDelayTime)
+	{
+		mState = EEnemyState::Idle;
+		CurrentTime = 0.f;
+	}
 }
 
 void UEnemyFSM::DieState()
@@ -137,42 +161,49 @@ void UEnemyFSM::DieState()
 
 void UEnemyFSM::BiteState()
 {
-	GEngine->AddOnScreenDebugMessage(-1, 3.0f, FColor::Black, TEXT("Bite"));
 	bitestate = true;
 }
 
 void UEnemyFSM::PatrolState()
 {
-	if (!me || !me->GetCharacterMovement() || !me->splineactor) return;
-	walkstate = true;
-	me->GetCharacterMovement()->MaxWalkSpeed = 50;
-	FVector destination_sp = me->splineactor->GetSplinePointasWorldPosition();
-	FVector dir_sp = destination_sp - me->GetActorLocation();
-	if (dir_sp.Size() < 150.0f)
+	me->GetCharacterMovement()->MaxWalkSpeed = 100;
+	auto result = ai->MoveToLocation(randomPos);
+	if (result == EPathFollowingRequestResult::AlreadyAtGoal)
 	{
-		me->splineactor->IncrementPatrolRoute();
-		GEngine->AddOnScreenDebugMessage(-1, 3.0f, FColor::Black, TEXT("Increment"));
-		EnterPatrolState();
+		GetRandomPositionInNavMesh(me->GetActorLocation(), 500.f, randomPos);
 	}
 }
 
-void UEnemyFSM::EnterPatrolState()
+bool UEnemyFSM::GetRandomPositionInNavMesh(FVector centerLocation, float radius, FVector& dest)
 {
-	GEngine->AddOnScreenDebugMessage(-1, 3.0f, FColor::Black, TEXT("Patrol"));
-	if (me->splineactor->splinecomp)
+	auto ns = UNavigationSystemV1::GetNavigationSystem(GetWorld());
+	FNavLocation loc;
+	bool result = ns->GetRandomReachablePointInRadius(centerLocation, radius, loc);
+	dest = loc.Location;
+	return result;
+}
+
+void UEnemyFSM::PunchStart()
+{
+	me->spherecomp_r->SetCollisionEnabled(ECollisionEnabled::QueryOnly);
+	me->isDamaged = false;
+}
+
+void UEnemyFSM::PunchEnd()
+{
+	me->spherecomp_r->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+	me->isDamaged = true;
+}
+
+void UEnemyFSM::OnDamageProcess(int32 damage)
+{
+	hp -= damage;
+	if (hp > 0)
 	{
-		if (me == nullptr || me->splineactor == nullptr || me->splineactor->splinecomp == nullptr)
-		{
-			return;
-		}
-		me->splineactor->GetSplinePointasWorldPosition();
-		AAIsight* Aicontroller = Cast<AAIsight>(me->GetController());
-		if (Aicontroller)
-		{
-			FAIMoveRequest MoveRequest;
-			MoveRequest.SetGoalLocation(me->splineactor->GetSplinePointasWorldPosition());
-			MoveRequest.SetAcceptanceRadius(10.0f);
-			Aicontroller->MoveTo(MoveRequest);
-		}
+		mState = EEnemyState::Damage;
+	}
+	else
+	{
+		mState = EEnemyState::Die;
 	}
 }

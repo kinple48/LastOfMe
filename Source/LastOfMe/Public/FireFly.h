@@ -33,4 +33,12 @@ public:
 public:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = FSMComponent)
 	class UFireFlyFSM* FSM;
+
+	UPROPERTY(EditAnywhere,BlueprintReadWrite)
+	class USphereComponent* spherecomp_r;
+
+	UFUNCTION()
+	void OnSphereRoverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult);
+
+	bool isDamaged = true;
 };
