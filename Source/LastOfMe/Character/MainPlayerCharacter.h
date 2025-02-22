@@ -76,12 +76,16 @@ protected:
 	void AttackAction (const FInputActionValue& inputValue);
 	void TEST         (const FInputActionValue& inputValue);
 
+
 	void OnRevolverKey(const FInputActionValue& inputValue);
 	void OnRifleKey   (const FInputActionValue& inputValue);
 	void OnBluntKey   (const FInputActionValue& inputValue);
 	void OnKnifeKey   (const FInputActionValue& inputValue);
 
 	void OnChangeActions(EActionState InActionType);
+
+	void SniperAim(const struct FInputActionValue& inputValue);
+
 
 	// 준우가 한다는 곳 
 	void Grab();
@@ -128,5 +132,22 @@ public:
 	EActionState NextActionType = EActionState::UNARMED;
 
 	bool bIsAttacking = false; 
+
+	bool bSniperAim = false;
+
+	UPROPERTY()
+	class UUserWidget* SniperUI;
+
+	UPROPERTY()
+	class UUserWidget* _CrossHariUI;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	TSubclassOf<class UUserWidget> SniperUIFactory;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	TSubclassOf<class UUserWidget> _CrossHariUIFactory;
+
+	
+
 };
 
