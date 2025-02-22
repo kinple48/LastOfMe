@@ -5,6 +5,12 @@
 #include "Components/SphereComponent.h"
 #include "Components/StaticMeshComponent.h"
 #include "GameFramework/ProjectileMovementComponent.h"
+#include "WeaponBase.h"
+#include "Revolver.h"
+#include "Enemy.h"
+#include "FireFlyFSM.h"
+#include "EnemyFSM.h"
+#include "../Character/MainPlayerCharacter.h"
 
 // Sets default values
 ABulletActor::ABulletActor()
@@ -47,6 +53,12 @@ ABulletActor::ABulletActor()
 void ABulletActor::BeginPlay()
 {
 	Super::BeginPlay();
+
+	ARevolver* revolver = Cast<ARevolver>(GetOwner());
+
+	OwnerCharacter = Cast<AMainPlayerCharacter>(GetOwner());
+
+	//BodyCollider = Cast<UShapeComponent>(GetComponentByClass(UShapeComponent::StaticClass()));
 	
 }
 
@@ -63,12 +75,46 @@ void ABulletActor::Tick(float DeltaTime)
 				    {
 				    	Destroy();
 				    })
-				    , 2.0f, false );
+				    , 100.0f, false );
+
+	MovementComp->Velocity = GetActorForwardVector() * bulletSpeed;
+
 }
 
-void ABulletActor::OnBulletBeginOverlap()
+void ABulletActor::OnBulletBeginOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
 {
-	
+	ARevolver* Revolver = Cast<ARevolver>(GetOwner());
+
+	if (!Revolver) return;
+
+	if (OtherActor == Revolver)
+		return;
+
+	if (OtherActor == Revolver->GetOwner())
+		return;
+
+	auto hitActor = SweepResult.GetActor();
+	if (!hitActor)
+		return;
+
+	// FireFly FSM 검사
+	if (auto fireflyEnemy = hitActor->GetDefaultSubobjectByName(TEXT("FSM")))
+	{
+		if (auto FenemyFSM = Cast<UFireFlyFSM>(fireflyEnemy))
+		{
+			FenemyFSM->OnDamageProcess(1);
+		}
+	}
+
+	// Zombi FSM 검사
+	if (auto zombiEnemy = hitActor->GetDefaultSubobjectByName(TEXT("FSM")))
+	{
+		if (auto ZBenemyFSM = Cast<UEnemyFSM>(zombiEnemy))
+		{
+			ZBenemyFSM->OnDamageProcess(1);
+		}
+	}
+	GEngine->AddOnScreenDebugMessage(-1, 3.0f, FColor::Blue, TEXT("BulletFire"));
 }
 
 void ABulletActor::Die()

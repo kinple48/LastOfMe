@@ -27,9 +27,18 @@ public:
 	void Fire();
 
 	void Attack();
+	
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	class USkeletalMeshComponent* RevolverMesh;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	class UArrowComponent* FirePosition;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	TSubclassOf<class ABulletActor> BulletFactory; 
+
+	UPROPERTY(EditAnywhere, Category = BulletEffect)
+	class UParticleSystem* BulletEffectFactory;
 
 
 };
