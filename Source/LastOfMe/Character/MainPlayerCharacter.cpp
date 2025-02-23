@@ -15,6 +15,8 @@
 #include "Weapon/BluntBase.h"
 #include "Components/ShapeComponent.h"
 #include "../Weapon/Rifle.h"
+#include "Blueprint/UserWidget.h"
+#include "../Weapon/Revolver.h"
 
 
 AMainPlayerCharacter::AMainPlayerCharacter()
@@ -89,6 +91,13 @@ void AMainPlayerCharacter::BeginPlay()
 		ActionTypes.Add(pari.Key, weapon);
 	}
 
+
+	SniperUI = CreateWidget<UUserWidget>(GetWorld(), SniperUIFactory);
+
+	_CrossHariUI = CreateWidget<UUserWidget>(GetWorld(), _CrossHariUIFactory);
+	_CrossHariUI->AddToViewport();
+
+
 }
 
 void AMainPlayerCharacter::Tick(float DeltaTime)
@@ -122,6 +131,8 @@ void AMainPlayerCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInpu
 		EnhancedInputComponent->BindAction(MyInputCoponent->IA_ChangeBlunt, ETriggerEvent::Started, this, &AMainPlayerCharacter::OnBluntKey);
 		EnhancedInputComponent->BindAction(MyInputCoponent->IA_ChangeKnife, ETriggerEvent::Started, this, &AMainPlayerCharacter::OnKnifeKey);
 
+		EnhancedInputComponent->BindAction(MyInputCoponent->IA_Sniper, ETriggerEvent::Started  , this, &AMainPlayerCharacter::SniperAim);
+		EnhancedInputComponent->BindAction(MyInputCoponent->IA_Sniper, ETriggerEvent::Completed, this, &AMainPlayerCharacter::SniperAim);
 
 		// ÁØ¿ìs 
 		EnhancedInputComponent->BindAction(MyInputCoponent->IA_Grab, ETriggerEvent::Started, this, &AMainPlayerCharacter::Grab);
@@ -230,6 +241,16 @@ void AMainPlayerCharacter::AttackAction(const FInputActionValue& inputValue)
 	{
 	case EActionState::UNARMED:
 		break;
+	case EActionState::REVOLVER:
+	{
+		ARevolver* Revolver = Cast<ARevolver>(GetCurrentAction());
+
+		if (Revolver)
+		{
+			Revolver->Attack();
+		}			
+	}
+		break;
 	default:
 		GetCurrentAction()->Attack();
 		break;
@@ -311,6 +332,28 @@ void AMainPlayerCharacter::OnKnifeKey(const FInputActionValue& inputValue)
 	OnChangeActions(EActionState::KNIFE);
 
 	GEngine->AddOnScreenDebugMessage(-1, 3.0f, FColor::Blue, TEXT("OnKnifeKey"));
+}
+
+void AMainPlayerCharacter::SniperAim(const struct FInputActionValue& inputValue)
+{
+	
+
+	bSniperAim = !bSniperAim;
+
+	if (bSniperAim)
+	{
+		SniperUI->AddToViewport();
+		playerCam->SetFieldOfView(45.0f);
+		_CrossHariUI->RemoveFromParent();
+	}
+	else
+	{
+		SniperUI->RemoveFromParent();
+		playerCam->SetFieldOfView(90.0f);
+		_CrossHariUI->AddToViewport();
+	}
+
+
 }
 
 void AMainPlayerCharacter::OnChangeActions(EActionState InActionType)

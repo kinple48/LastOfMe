@@ -28,7 +28,7 @@ void AWeaponBase::BeginPlay()
 {
 	Super::BeginPlay();
 	
-	OwnerCharacter = Cast <AMainPlayerCharacter>(GetOwner());
+	OwnerCharacter = Cast<AMainPlayerCharacter>(GetOwner());
 
 	BodyCollider = Cast<UShapeComponent>(GetComponentByClass(UShapeComponent::StaticClass()));
 	//BodyCollider->SetCollisionEnabled(ECollisionEnabled::NoCollision);
@@ -70,6 +70,9 @@ bool AWeaponBase::AttachToHand(USceneComponent* InParent)
 void AWeaponBase::Attack()
 {	
 	OwnerCharacter->PlayAnimMontage(AttackMontage);
+
+	auto controller = GetWorld()->GetFirstPlayerController();
+	controller->PlayerCameraManager->StartCameraShake(CameraShake);
 }
 
 void AWeaponBase::OnBodyColliderBeginOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)

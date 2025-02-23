@@ -15,7 +15,11 @@
 
 ARifle::ARifle()
 {
-	
+	ConstructorHelpers::FObjectFinder<USoundBase> TempSound(TEXT("/Script/Engine.SoundWave'/Game/SSA/UI/Rifle.Rifle'"));
+	if (TempSound.Succeeded())
+	{
+		WeaponSound = TempSound.Object;
+	}
 }
 
 void ARifle::BeginPlay()
@@ -34,6 +38,8 @@ void ARifle::Tick(float DeltaTime)
 void ARifle::Attack()
 {
 	Super::Attack();
+
+	UGameplayStatics::PlaySound2D(GetWorld(), WeaponSound);
 
 	Fire();
 }
@@ -62,8 +68,8 @@ void ARifle::Fire()
 
 		BulletTrans.SetLocation(hitInfo.ImpactPoint);
 
-		//  이펙트 사용할 때 켜주기 
-		//UGameplayStatics::SpawnEmitterAtLocation(GetWorld(), BulletEffectFactory, BulletTrans);
+		//이펙트 사용할 때 켜주기
+		UGameplayStatics::SpawnEmitterAtLocation(GetWorld(), BulletEffectFactory, BulletTrans);
 
 		auto hitComp = hitInfo.GetComponent();
 

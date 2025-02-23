@@ -33,13 +33,19 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	class USphereComponent* CollisionComp;
 
+	class AMainPlayerCharacter* OwnerCharacter;
 
 public:
 	UFUNCTION()
-	void OnBulletBeginOverlap();
+	void OnBulletBeginOverlap(UPrimitiveComponent* OverlappedComponent,
+							  AActor* OtherActor,
+							  UPrimitiveComponent* OtherComp,
+							  int32 OtherBodyIndex,
+							  bool bFromSweep,
+		const FHitResult& SweepResult);
 
 	void Die();
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	float bulletSpeed = 3000.0f;
+	float bulletSpeed = 100.0f;
 };

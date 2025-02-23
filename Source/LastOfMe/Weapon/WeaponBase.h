@@ -77,4 +77,10 @@ protected:
 
 	//UPROPERTY(EditDefaultsOnly, Category = CameraMotion)
 	//TSubclassOf<class UCameraShakeBase> CameraShake;
+
+	UPROPERTY(EditDefaultsOnly, Category = CameraMotion)
+	TSubclassOf<class UCameraShakeBase> CameraShake;
+
+	UPROPERTY()
+	class USoundBase* WeaponSound;
 };
