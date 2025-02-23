@@ -57,10 +57,13 @@ void AFireFlyController::PerceptionUpdated(const TArray<AActor*>& UpdatedActors)
 		{
 			if (CanSenseActor(UpdatedActor, FireFlyAISense::Sight) || CanSenseActor(UpdatedActor, FireFlyAISense::Damage) || CanSenseActor(UpdatedActor, FireFlyAISense::Hearing))
 			{
-				GEngine->AddOnScreenDebugMessage(-1, 3.0f, FColor::Black, TEXT("hello"));
-				class AFireFly* firefly = Cast<AFireFly>(GetCharacter());
-				firefly->FindComponentByClass<UFireFlyFSM>()->mState = EFireFlyState::Move;
-				firefly->FindComponentByClass<UFireFlyFSM>()->Anim->AnimState = EFireFlyState::Move;
+				if (!isDead)
+				{
+					GEngine->AddOnScreenDebugMessage(-1, 3.0f, FColor::Black, TEXT("hello"));
+					class AFireFly* firefly = Cast<AFireFly>(GetCharacter());
+					firefly->FindComponentByClass<UFireFlyFSM>()->mState = EFireFlyState::Move;
+					firefly->FindComponentByClass<UFireFlyFSM>()->Anim->AnimState = EFireFlyState::Move;
+				}
 			}
 		}
 	}

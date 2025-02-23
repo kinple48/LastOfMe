@@ -16,7 +16,8 @@ enum class EEnemyState : uint8
 	Damage ,
 	Die ,
 	Bite,
-	Patrol
+	Patrol,
+	Grab
 };
 
 UCLASS( ClassGroup=(Custom), meta=(BlueprintSpawnableComponent) )
@@ -60,6 +61,8 @@ public:
 	void BiteState();
 
 	void PatrolState();
+
+	void GrabState();
 
 	UPROPERTY(EditAnywhere, Category = FSM)
 	float TraceRange = 500.0f;

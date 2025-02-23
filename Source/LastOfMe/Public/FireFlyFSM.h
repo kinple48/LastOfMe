@@ -15,7 +15,8 @@ enum class EFireFlyState : uint8
 	MeleeAttack ,
 	Damage ,
 	Die ,
-	Patrol
+	Patrol,
+	Grab
 };
 
 UCLASS( ClassGroup=(Custom), meta=(BlueprintSpawnableComponent) )
@@ -59,7 +60,10 @@ public:
 
 	void PatrolState();
 
+	void GrabState();
+
 	float CurrentTime = 0.f;
+	float damageDelayTime = 2.f;
 	float IdleDelayTime = 2.f;
 	float RangedAttackRange = 700.f;
 	UPROPERTY(EditAnywhere)

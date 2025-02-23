@@ -15,6 +15,7 @@
 #include "KismetTraceUtils.h"
 #include "CollisionQueryParams.h"
 #include "Components/SphereComponent.h"
+#include "Components/CapsuleComponent.h"
 
 // Sets default values for this component's properties
 UFireFlyFSM::UFireFlyFSM()
@@ -52,8 +53,8 @@ void UFireFlyFSM::TickComponent(float DeltaTime, ELevelTick TickType, FActorComp
 {
 	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
 
-	//FString logMsg = UEnum::GetValueAsString(mState);
-	//GEngine->AddOnScreenDebugMessage(0, 1.0f, FColor::Red, logMsg);
+	FString logMsg = UEnum::GetValueAsString(mState);
+	GEngine->AddOnScreenDebugMessage(0, 1.0f, FColor::Red, logMsg);
 
 	switch (mState)
 	{
@@ -64,6 +65,7 @@ void UFireFlyFSM::TickComponent(float DeltaTime, ELevelTick TickType, FActorComp
 	case EFireFlyState::Damage: { DamageState(); } break;
 	case EFireFlyState::Die: { DieState(); } break;
 	case EFireFlyState::Patrol: { PatrolState(); } break;
+	case EFireFlyState::Grab: { GrabState(); } break;
 	}
 }
 
@@ -193,12 +195,18 @@ void UFireFlyFSM::MeleeAttackState()
 
 void UFireFlyFSM::DamageState()
 {
-
+	CurrentTime += GetWorld()->DeltaTimeSeconds;
+	if (CurrentTime >= damageDelayTime)
+	{
+		mState = EFireFlyState::Idle;
+		CurrentTime = 0.f;
+	}
 }
 
 void UFireFlyFSM::DieState()
 {
-
+	ai->isDead = true;
+	me->GetCapsuleComponent()->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 }
 
 
@@ -210,6 +218,13 @@ void UFireFlyFSM::PatrolState()
 	{
 		GetRandomPositionInNavMesh(me->GetActorLocation(), 500.f, randomPos);
 	}
+}
+
+void UFireFlyFSM::GrabState()
+{
+	ai->StopMovement();
+	Anim->AnimState = mState;
+	ai->isDead = true;
 }
 
 bool UFireFlyFSM::GetRandomPositionInNavMesh(FVector centerLocation, float radius, FVector& dest)

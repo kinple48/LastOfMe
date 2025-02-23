@@ -44,4 +44,6 @@ public:
 
 	UPROPERTY()
 	class AFireFly* me;
+
+	bool isDead = false;
 };

@@ -35,7 +35,13 @@ public:
 	class UAnimMontage* EquipAnimMontage; 
 
 	UPROPERTY(EditDefaultsOnly, Category = LOMAnimPlayer)
-	class UAnimMontage* UnEquipAnimMontage; 
+	class UAnimMontage* UnEquipAnimMontage;
+
+	UPROPERTY(EditDefaultsOnly, Category = LOMAnimPlayer)
+	class UAnimMontage* GrabMontage; 
+
+	UFUNCTION()
+	void AnimNotify_grabend();
 
 protected:
 

@@ -17,6 +17,11 @@
 #include "../Weapon/Rifle.h"
 #include "Blueprint/UserWidget.h"
 #include "../Weapon/Revolver.h"
+#include "Enemy.h"
+#include "Kismet/GameplayStatics.h"
+#include "EnemyFSM.h"
+#include "FireFly.h"
+#include "FireFlyFSM.h"
 
 
 AMainPlayerCharacter::AMainPlayerCharacter()
@@ -398,15 +403,6 @@ void AMainPlayerCharacter::OnChangeActions(EActionState InActionType)
 		break;*/
 }
 
-void AMainPlayerCharacter::Grab()
-{
-}
-
-void AMainPlayerCharacter::FKey()
-{
-}
-
-
 void AMainPlayerCharacter::OnAttackBegin()
 {
 	StateComponent->bIsAttacking = true;
@@ -452,5 +448,125 @@ void AMainPlayerCharacter::OnSheathActionEnd()
 	}
 
 	
+}
+
+
+// 잡기 구현
+void AMainPlayerCharacter::Grab()
+{
+	if (cangrab)
+	{
+		GetCharacterMovement()->DisableMovement();
+		this->bUseControllerRotationYaw = false;
+		GetCharacterMovement()->bOrientRotationToMovement = false;
+		GEngine->AddOnScreenDebugMessage(-1, 3.0f, FColor::Blue, TEXT("grab"));
+		FString sectionName = FString::Printf(TEXT("grab"));
+		this->PlayAnimMontage(Anim->GrabMontage, 1.f, FName(*sectionName));
+		TArray<AActor*> FoundActors;
+		UGameplayStatics::GetAllActorsOfClassWithTag(GetWorld(), AEnemy::StaticClass(), FName("enemy"), FoundActors);
+
+		float NearestDistance = MAX_FLT;
+		for (AActor* Actor : FoundActors)
+		{
+			float Distance = FVector::Dist(GetActorLocation(), Actor->GetActorLocation());
+			if (Distance < NearestDistance)
+			{
+				NearestDistance = Distance;
+				enemy = Cast<AEnemy>(Actor);
+			}
+		}
+
+		if (enemy)
+		{
+			FName EnemyNeckBoneName = "Neck";
+			FName PlayerSocketName = "GrabSocket";
+
+			// 플레이어의 소켓 위치 가져오기
+			FVector SocketLocation = GetMesh()->GetSocketLocation(PlayerSocketName);
+
+			// 적의 목 본 위치 가져오기
+			FVector NeckLocation = enemy->GetMesh()->GetBoneLocation(EnemyNeckBoneName);
+
+			// 적의 위치 조정
+			FVector NewLocation = SocketLocation - (NeckLocation - enemy->GetActorLocation());
+
+			// 플레이어의 전방 및 우측 벡터 가져오기
+			FVector ForwardVector = GetActorForwardVector();
+			FVector RightVector = GetActorRightVector();
+
+			// x_shift와 y_shift를 플레이어의 방향에 맞춰 적용
+			NewLocation += ForwardVector * x_shift + RightVector * y_shift;
+
+			enemy->SetActorLocation(NewLocation);
+
+			// 적 회전
+			FRotator NewRotation = GetActorRotation();
+			enemy->SetActorRotation(NewRotation);
+			enemy->FSM->mState = EEnemyState::Grab;
+		}
+	}
+
+	if (cangrab1)
+	{
+		GetCharacterMovement()->DisableMovement();
+		this->bUseControllerRotationYaw = false;
+		GetCharacterMovement()->bOrientRotationToMovement = false;
+		GEngine->AddOnScreenDebugMessage(-1, 3.0f, FColor::Blue, TEXT("grab"));
+		FString sectionName = FString::Printf(TEXT("grab"));
+		this->PlayAnimMontage(Anim->GrabMontage, 1.f, FName(*sectionName));
+		TArray<AActor*> foundactors;
+		UGameplayStatics::GetAllActorsOfClassWithTag(GetWorld(), AFireFly::StaticClass(), FName("firefly"), foundactors);
+
+		float NearestDistance = MAX_FLT;
+		for (AActor* Actor : foundactors)
+		{
+			float Distance = FVector::Dist(GetActorLocation(), Actor->GetActorLocation());
+			if (Distance < NearestDistance)
+			{
+				NearestDistance = Distance;
+				firefly = Cast<AFireFly>(Actor);
+			}
+		}
+
+		if (firefly)
+		{
+			FName EnemyNeckBoneName = "neck_01";
+			FName PlayerSocketName = "GrabSocket";
+
+			// 플레이어의 소켓 위치 가져오기
+			FVector SocketLocation = GetMesh()->GetSocketLocation(PlayerSocketName);
+
+			// 적의 목 본 위치 가져오기
+			FVector NeckLocation = firefly->GetMesh()->GetBoneLocation(EnemyNeckBoneName);
+
+			// 적의 위치 조정
+			FVector NewLocation = SocketLocation - (NeckLocation - firefly->GetActorLocation());
+
+			// 플레이어의 전방 및 우측 벡터 가져오기
+			FVector ForwardVector = GetActorForwardVector();
+			FVector RightVector = GetActorRightVector();
+
+			// x_shift와 y_shift를 플레이어의 방향에 맞춰 적용
+			NewLocation += ForwardVector * x_shift + RightVector * y_shift;
+
+			firefly->SetActorLocation(NewLocation);
+
+			// 적 회전
+			FRotator NewRotation = GetActorRotation();
+			firefly->SetActorRotation(NewRotation);
+			firefly->FSM->mState = EFireFlyState::Grab;
+		}
+	}
+}
+
+void AMainPlayerCharacter::grabend()
+{
+	GetCharacterMovement()->SetMovementMode(MOVE_Walking);
+	this->bUseControllerRotationYaw = true;
+	GetCharacterMovement()->bOrientRotationToMovement = true;
+}
+
+void AMainPlayerCharacter::FKey()
+{
 }
 

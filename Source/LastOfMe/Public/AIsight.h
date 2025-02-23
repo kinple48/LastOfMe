@@ -38,4 +38,6 @@ public:
 	void PerceptionUpdated(const TArray<AActor*>& UpdatedActors);
 
 	bool CanSenseActor(AActor* actor, enemyAISense AIPerceptionSense);
+
+	bool isDead = false;
 };

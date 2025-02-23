@@ -53,10 +53,13 @@ void AAIsight::PerceptionUpdated(const TArray<AActor*>& UpdatedActors)
 		{
 			if (CanSenseActor(UpdatedActor, enemyAISense::Sight) || CanSenseActor(UpdatedActor, enemyAISense::Damage) || CanSenseActor(UpdatedActor, enemyAISense::Hearing))
 			{
-				GEngine->AddOnScreenDebugMessage(-1, 3.0f, FColor::Black, TEXT("hello"));
-				class AEnemy* enemy = Cast<AEnemy>(GetCharacter());
-				enemy->FindComponentByClass<UEnemyFSM>()->mState = EEnemyState::Move;
-				enemy->FindComponentByClass<UEnemyFSM>()->Anim->AnimState = EEnemyState::Move;
+				if (!isDead)
+				{
+					GEngine->AddOnScreenDebugMessage(-1, 3.0f, FColor::Black, TEXT("hello"));
+					class AEnemy* enemy = Cast<AEnemy>(GetCharacter());
+					enemy->FindComponentByClass<UEnemyFSM>()->mState = EEnemyState::Move;
+					enemy->FindComponentByClass<UEnemyFSM>()->Anim->AnimState = EEnemyState::Move;
+				}
 			}
 		}
 	}

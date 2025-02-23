@@ -16,6 +16,9 @@
 #include "EnemyAnimInstance.h"
 #include "Components/SphereComponent.h"
 #include "Animation/AnimMontage.h"
+#include "Perception/AIPerceptionComponent.h"
+#include "AIController.h"
+#include "Components/CapsuleComponent.h"
 
 UEnemyFSM::UEnemyFSM()
 {
@@ -44,8 +47,8 @@ void UEnemyFSM::TickComponent(float DeltaTime, ELevelTick TickType, FActorCompon
 {
 	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
 
-	FString logMsg = UEnum::GetValueAsString(mState);
-	GEngine->AddOnScreenDebugMessage(0, 1.0f, FColor::Red, logMsg);
+	//FString logMsg = UEnum::GetValueAsString(mState);
+	//GEngine->AddOnScreenDebugMessage(0, 1.0f, FColor::Red, logMsg);
 
 	switch (mState)
 	{
@@ -56,6 +59,7 @@ void UEnemyFSM::TickComponent(float DeltaTime, ELevelTick TickType, FActorCompon
 	case EEnemyState::Die: { DieState(); } break;
 	case EEnemyState::Bite: { BiteState(); } break;
 	case EEnemyState::Patrol: { PatrolState(); } break;
+	case EEnemyState::Grab: { GrabState(); } break;
 	}
 
 }
@@ -112,17 +116,6 @@ void UEnemyFSM::MoveState()
 			CurrentTime = attackDelayTime;
 		}
 	}
-	/*else
-	{
-
-		me->GetCharacterMovement()->MaxWalkSpeed = 100;
-		auto result = ai->MoveToLocation(randomPos);
-		if (result == EPathFollowingRequestResult::AlreadyAtGoal)
-		{
-			GetRandomPositionInNavMesh(me->GetActorLocation(), 500.f, randomPos);
-		}
-	}*/
-
 }
 
 void UEnemyFSM::AttackState()
@@ -166,7 +159,8 @@ void UEnemyFSM::DamageState()
 
 void UEnemyFSM::DieState()
 {
-
+	ai->isDead = true;
+	me->GetCapsuleComponent()->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 }
 
 void UEnemyFSM::BiteState()
@@ -181,6 +175,13 @@ void UEnemyFSM::PatrolState()
 	{
 		GetRandomPositionInNavMesh(me->GetActorLocation(), 500.f, randomPos);
 	}
+}
+
+void UEnemyFSM::GrabState()
+{
+	ai->StopMovement();
+	Anim->AnimState = mState;
+	ai->isDead = true;
 }
 
 bool UEnemyFSM::GetRandomPositionInNavMesh(FVector centerLocation, float radius, FVector& dest)

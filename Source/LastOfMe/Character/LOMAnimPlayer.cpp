@@ -60,6 +60,14 @@ void ULOMAnimPlayer::UnEquipWeapon()
 	Montage_Play(UnEquipAnimMontage);
 }
 
+void ULOMAnimPlayer::AnimNotify_grabend()
+{
+	if (AMainPlayerCharacter* player = Cast<AMainPlayerCharacter>(TryGetPawnOwner()))
+	{
+		player->grabend();
+	}
+}
+
 void ULOMAnimPlayer::AnimNotify_AttackEnd()
 {
 	Player = Cast<AMainPlayerCharacter>(TryGetPawnOwner());

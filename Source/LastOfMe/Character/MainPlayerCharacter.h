@@ -86,12 +86,6 @@ protected:
 
 	void SniperAim(const struct FInputActionValue& inputValue);
 
-
-	// 준우가 한다는 곳 
-	void Grab();
-	void FKey();
-
-
 	AWeaponBase* GetCurrentAction()
 	{
 		if (ActionTypes.Contains(CurActionType))
@@ -147,7 +141,25 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	TSubclassOf<class UUserWidget> _CrossHariUIFactory;
 
+// 잡기 구현 
+public:
+	void Grab();
+	void FKey();
+	bool cangrab = false;
+	bool cangrab1 = false;
+
+	UPROPERTY()
+	class AEnemy* enemy;
+
+	UPROPERTY()
+	class AFireFly* firefly;
+
+	void grabend();
 	
+	UPROPERTY(EditAnywhere,BlueprintReadWrite)
+	float x_shift = 100.f;
+	UPROPERTY(EditAnywhere,BlueprintReadWrite)
+	float y_shift = 40.f;
 
 };
 
