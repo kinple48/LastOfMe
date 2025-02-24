@@ -63,6 +63,18 @@ public:
 	UFUNCTION(BlueprintCallable)
 	void OnAttackEnd();
 
+	//// 노티파이 실행
+	//UPROPERTY()
+	//void HandleOnMontageNotifyBegin(FName a_nNotiyfyName, const FBranchingPointNotifyPayload& a_pBranchingPayLoad);
+
+	int ComboAttackIndex = 0;
+
+	UFUNCTION()
+	void HandleOnMontageNotifyBegin(FName a_nNotifyName, const FBranchingPointNotifyPayload& a_pBranchingPayLoad);
+
+	void PerformHandSphereTraces();
+	
+
 protected:
 	void LookUp     (const FInputActionValue& inputValue);
 	void Turn       (const FInputActionValue& inputValue);
@@ -81,6 +93,10 @@ protected:
 	void OnRifleKey   (const FInputActionValue& inputValue);
 	void OnBluntKey   (const FInputActionValue& inputValue);
 	void OnKnifeKey   (const FInputActionValue& inputValue);
+
+
+	
+	
 
 	void OnChangeActions(EActionState InActionType);
 
@@ -129,6 +145,8 @@ public:
 
 	bool bSniperAim = false;
 
+	bool bCanCombo = false; 
+
 	UPROPERTY()
 	class UUserWidget* SniperUI;
 
@@ -160,6 +178,17 @@ public:
 	float x_shift = 100.f;
 	UPROPERTY(EditAnywhere,BlueprintReadWrite)
 	float y_shift = 40.f;
+
+	UPROPERTY(EditDefaultsOnly, Category = CameraMotion)
+	TSubclassOf<class UCameraShakeBase> CameraShake;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	class USphereComponent* meleeAttack_R;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	class USphereComponent* meleeAttack_L;
+
+	
 
 };
 

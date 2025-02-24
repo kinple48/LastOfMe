@@ -33,3 +33,25 @@ void UStateComponent::TickComponent(float DeltaTime, ELevelTick TickType, FActor
 	// ...
 }
 
+void UStateComponent::TakeDamage(float DamagedAmount)
+{
+	SetCurHP(CurHP - DamagedAmount);
+
+	APawn* Player = Cast<APawn>(GetOwner());
+}
+
+float UStateComponent::GetCurHP()
+{
+	return CurHP;
+}
+
+float UStateComponent::GetMaxHP()
+{
+	return MaxHP;
+}
+
+float UStateComponent::GetDamage()
+{
+	return Damage;
+}
+

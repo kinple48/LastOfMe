@@ -26,6 +26,9 @@ public:
 	virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
 
 public:
+	void TakeDamage(float DamageAmount);
+
+public:
 
 	// 빌드업 패턴? 하나씩 빌드가 가능함 자기 자신을 반환
 	
@@ -37,7 +40,14 @@ public:
 	UStateComponent* SetCurHP (float   InCurHP) { this->CurHP  =  InCurHP;  return this; }
 	UStateComponent* SetDamage(int32  InDamage) { this->Damage = InDamage;  return this; }
 
+	UFUNCTION(BlueprintCallable)
+	float GetCurHP();       
 
+	UFUNCTION(BlueprintCallable)
+	float GetMaxHP();       
+
+
+	float GetDamage();  
 
 public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "boolean")

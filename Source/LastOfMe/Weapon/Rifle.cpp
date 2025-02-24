@@ -110,8 +110,8 @@ void ARifle::Fire()
 
 	}
 	
-	FHitResult hitResult;
-	DrawDebugLineTraceSingle(GetWorld(), startPos, endPos, EDrawDebugTrace::ForDuration, true, hitResult, FLinearColor::Green, FLinearColor::Red, 3.0f);
+	//HitResult hitResult;
+	//rawDebugLineTraceSingle(GetWorld(), startPos, endPos, EDrawDebugTrace::ForDuration, true, hitResult, FLinearColor::Green, FLinearColor::Red, 3.0f);
 
 }
 
