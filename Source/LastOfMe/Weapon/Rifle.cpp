@@ -93,7 +93,7 @@ void ARifle::Fire()
 			if (auto FenemyFSM = Cast<UFireFlyFSM>(fireflyEnemy))
 			{
 				FenemyFSM->OnDamageProcess(1);
-				MakeNoise(5.0f, OwnerCharacter, GetActorLocation(), 1000.f, TEXT("enemysound"));
+				MakeNoise(3.0f, OwnerCharacter, GetActorLocation(), 1000.f, TEXT("enemysound"));
 			}
 		}
 
@@ -103,7 +103,7 @@ void ARifle::Fire()
 			if (auto ZBenemyFSM = Cast<UEnemyFSM>(zombiEnemy))
 			{
 				ZBenemyFSM->OnDamageProcess(1);
-				MakeNoise(5.0f, OwnerCharacter, GetActorLocation(), 1000.f, TEXT("enemysound"));
+				MakeNoise(3.0f, OwnerCharacter, GetActorLocation(), 1000.f, TEXT("enemysound"));
 			}
 		}
 		
