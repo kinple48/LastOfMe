@@ -22,6 +22,10 @@
 #include "EnemyFSM.h"
 #include "FireFly.h"
 #include "FireFlyFSM.h"
+#include "GameFramework/Character.h"
+#include "Animation/AnimNotifies/AnimNotify.h"
+#include "Components/SphereComponent.h"
+
 
 
 AMainPlayerCharacter::AMainPlayerCharacter()
@@ -38,6 +42,19 @@ AMainPlayerCharacter::AMainPlayerCharacter()
 
 	MyInputCoponent = CreateDefaultSubobject<ULOMInputComponent>(TEXT("MyInputComponent"));
 	StateComponent  = CreateDefaultSubobject<UStateComponent>   (TEXT("StateComponent"  ));
+
+
+	meleeAttack_R = CreateDefaultSubobject<USphereComponent>(TEXT("meleeAttack_R"));
+	meleeAttack_R->AttachToComponent(GetMesh(), FAttachmentTransformRules::KeepWorldTransform, "meleeAttack_R");
+	meleeAttack_R->SetCollisionProfileName(TEXT("OverlapAll"));
+
+	meleeAttack_L = CreateDefaultSubobject<USphereComponent>(TEXT("meleeAttack_L"));
+	meleeAttack_L->AttachToComponent(GetMesh(), FAttachmentTransformRules::KeepWorldTransform, "meleeAttack_L");
+	meleeAttack_L->SetCollisionProfileName(TEXT("OverlapAll"));
+
+
+
+
 	
 	
 	ConstructorHelpers::FObjectFinder<USkeletalMesh> TempMesh(TEXT("/Script/Engine.SkeletalMesh'/Game/Survival_Character/Meshes/SK_Survival_Character.SK_Survival_Character'"));
@@ -103,6 +120,11 @@ void AMainPlayerCharacter::BeginPlay()
 	_CrossHariUI->AddToViewport();
 
 
+	UAnimInstance* pAnimInst = GetMesh()->GetAnimInstance();
+	if (pAnimInst != nullptr)
+	{
+		pAnimInst->OnPlayMontageNotifyBegin.AddDynamic(this, &AMainPlayerCharacter::HandleOnMontageNotifyBegin);
+	}
 }
 
 void AMainPlayerCharacter::Tick(float DeltaTime)
@@ -133,8 +155,8 @@ void AMainPlayerCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInpu
 
 		EnhancedInputComponent->BindAction(MyInputCoponent->IA_ChangeWeapon, ETriggerEvent::Started, this, &AMainPlayerCharacter::OnRevolverKey);
 		EnhancedInputComponent->BindAction(MyInputCoponent->IA_ChangeRifle , ETriggerEvent::Started, this, &AMainPlayerCharacter::OnRifleKey);
-		EnhancedInputComponent->BindAction(MyInputCoponent->IA_ChangeBlunt, ETriggerEvent::Started, this, &AMainPlayerCharacter::OnBluntKey);
-		EnhancedInputComponent->BindAction(MyInputCoponent->IA_ChangeKnife, ETriggerEvent::Started, this, &AMainPlayerCharacter::OnKnifeKey);
+		EnhancedInputComponent->BindAction(MyInputCoponent->IA_ChangeBlunt , ETriggerEvent::Started, this, &AMainPlayerCharacter::OnBluntKey);
+		EnhancedInputComponent->BindAction(MyInputCoponent->IA_ChangeKnife , ETriggerEvent::Started, this, &AMainPlayerCharacter::OnKnifeKey);
 
 		EnhancedInputComponent->BindAction(MyInputCoponent->IA_Sniper, ETriggerEvent::Started  , this, &AMainPlayerCharacter::SniperAim);
 		EnhancedInputComponent->BindAction(MyInputCoponent->IA_Sniper, ETriggerEvent::Completed, this, &AMainPlayerCharacter::SniperAim);
@@ -237,6 +259,74 @@ void AMainPlayerCharacter::CrouchStart(const FInputActionValue& inputValue)
 	}
 }
 
+void AMainPlayerCharacter::HandleOnMontageNotifyBegin(FName a_nNotifyName, const FBranchingPointNotifyPayload& a_pBranchingPayLoad)
+{
+	ComboAttackIndex--;
+
+	if (ComboAttackIndex < 0)
+	{
+		UAnimInstance* pAnimInst = GetMesh()->GetAnimInstance();
+		if (pAnimInst != nullptr)
+		{
+			pAnimInst->Montage_Stop(0.4f, Anim->AttackAnimMontage);
+		}
+	}
+
+	//if (a_nNotifyName == "EnableCombo") // "EnableCombo"는 애니메이션에서 설정한 노티파이 이름
+	//{
+	//	bCanCombo = true; // 콤보 입력 가능 상태로 변경
+	//}
+	//else if (a_nNotifyName == "EndCombo") // 공격이 끝날 때
+	//{
+	//	bCanCombo = false;
+	//	bIsAttacking = false; // 공격 종료
+	//	ComboAttackIndex = 0; // 콤보 초기화
+	//}
+}
+
+void AMainPlayerCharacter::PerformHandSphereTraces()
+{
+	FVector Start = GetActorLocation() + GetActorForwardVector() * 100.0f;
+	FVector End = Start + GetActorForwardVector() * 150.0f;
+	float Radius = 50.0f;
+
+	FHitResult HitResult;
+	FCollisionQueryParams Params;
+	Params.AddIgnoredActor(this); // 자기 자신 제외
+
+	bool bHit = GetWorld()->SweepSingleByChannel(
+		HitResult,
+		Start,
+		End,
+		FQuat::Identity,
+		ECC_Pawn,  // 캐릭터만 충돌 체크
+		FCollisionShape::MakeSphere(Radius),
+		Params
+	);
+
+	//if (bHit)
+	//{
+	//	// FireFly FSM 검사
+	//	if (auto fireflyEnemy = Cast<UFireFlyFSM>(zombiEnemy))
+	//	{
+	//		if (auto FenemyFSM = Cast<UFireFlyFSM>(fireflyEnemy))
+	//		{
+	//			FenemyFSM->OnDamageProcess(1);
+	//		}
+	//	}
+
+	//	// Zombi FSM 검사
+	//	if (auto zombiEnemy = Cast<UEnemyFSM>(zombiEnemy))
+	//	{
+	//		if (auto ZBenemyFSM = Cast<UEnemyFSM>(zombiEnemy))
+	//		{
+	//			ZBenemyFSM->OnDamageProcess(1);
+	//		}
+	//	}
+	//	
+	//}
+}
+
 void AMainPlayerCharacter::AttackAction(const FInputActionValue& inputValue)
 {
 	if (bIsAttacking)
@@ -245,6 +335,48 @@ void AMainPlayerCharacter::AttackAction(const FInputActionValue& inputValue)
 	switch (CurActionType)
 	{
 	case EActionState::UNARMED:
+	{
+		Anim->PlayAttackAnim(ComboAttackIndex);
+
+		ComboAttackIndex = 1;
+
+		FHitResult hitInfo;
+
+		auto hitActor = hitInfo.GetActor();
+		if (!hitActor)
+			return;
+
+		// FireFly FSM 검사
+		if (auto fireflyEnemy = hitActor->GetDefaultSubobjectByName(TEXT("FSM")))
+		{
+			if (auto FenemyFSM = Cast<UFireFlyFSM>(fireflyEnemy))
+			{
+				FenemyFSM->OnDamageProcess(1);
+			}
+		}
+
+		// Zombi FSM 검사
+		if (auto zombiEnemy = hitActor->GetDefaultSubobjectByName(TEXT("FSM")))
+		{
+			if (auto ZBenemyFSM = Cast<UEnemyFSM>(zombiEnemy))
+			{
+				ZBenemyFSM->OnDamageProcess(1);
+			}
+		}
+
+		//if (bCanCombo) // 콤보 입력이 가능하면 다음 공격 실행
+		//{
+		//	ComboAttackIndex++;
+		//}
+		//else // 첫 공격이면 콤보 시작
+		//{
+		//	ComboAttackIndex = 1;
+		//}
+
+		//bCanCombo = false; // 다시 입력 받을 때까지 비활성화
+		////bIsAttacking = true;
+		//Anim->PlayAttackAnim(ComboAttackIndex); // 현재 콤보 인덱스로 애니메이션 실행
+	}
 		break;
 	case EActionState::REVOLVER:
 	{
@@ -260,7 +392,7 @@ void AMainPlayerCharacter::AttackAction(const FInputActionValue& inputValue)
 		GetCurrentAction()->Attack();
 		break;
 	}
-
+	
 	/*switch (CurActionType)
 	{
 	case EActionState::UNARMED:
@@ -341,23 +473,23 @@ void AMainPlayerCharacter::OnKnifeKey(const FInputActionValue& inputValue)
 
 void AMainPlayerCharacter::SniperAim(const struct FInputActionValue& inputValue)
 {
-	
-
-	bSniperAim = !bSniperAim;
-
-	if (bSniperAim)
+	if (CurActionType == EActionState::RIFLE)
 	{
-		SniperUI->AddToViewport();
-		playerCam->SetFieldOfView(45.0f);
-		_CrossHariUI->RemoveFromParent();
-	}
-	else
-	{
-		SniperUI->RemoveFromParent();
-		playerCam->SetFieldOfView(90.0f);
-		_CrossHariUI->AddToViewport();
-	}
+		bSniperAim = !bSniperAim;
 
+		if (bSniperAim)
+		{
+			SniperUI->AddToViewport();
+			playerCam->SetFieldOfView(45.0f);
+			_CrossHariUI->RemoveFromParent();
+		}
+		else
+		{
+			SniperUI->RemoveFromParent();
+			playerCam->SetFieldOfView(90.0f);
+			_CrossHariUI->AddToViewport();
+		}
+	}
 
 }
 
@@ -408,13 +540,17 @@ void AMainPlayerCharacter::OnAttackBegin()
 	StateComponent->bIsAttacking = true;
 
 	//GetCurrentAction()->GetBodyCollider()->SetCollisionEnabled(ECollisionEnabled::QueryAndPhysics); // 총일 때는 빼기 
+	meleeAttack_R->SetGenerateOverlapEvents(true);
+	meleeAttack_L->SetGenerateOverlapEvents(true);
+
 }
 
 void AMainPlayerCharacter::OnAttackEnd()
 {
 	StateComponent->bIsAttacking = false; 
 	//GetCurrentAction()->GetBodyCollider()->SetCollisionEnabled(ECollisionEnabled::NoCollision); // 총일 때는 빼기 
-
+	meleeAttack_R->SetGenerateOverlapEvents(false);
+	meleeAttack_L->SetGenerateOverlapEvents(false);
 }
 
 void AMainPlayerCharacter::OnDrawActionEnd()
@@ -456,6 +592,9 @@ void AMainPlayerCharacter::Grab()
 {
 	if (cangrab)
 	{
+		auto controller = GetWorld()->GetFirstPlayerController();
+		controller->PlayerCameraManager->StartCameraShake(CameraShake);
+
 		GetCharacterMovement()->DisableMovement();
 		this->bUseControllerRotationYaw = false;
 		GetCharacterMovement()->bOrientRotationToMovement = false;

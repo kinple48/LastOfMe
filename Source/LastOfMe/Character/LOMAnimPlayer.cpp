@@ -42,10 +42,24 @@ void ULOMAnimPlayer::NativeUpdateAnimation(float DeltaSeconds)
 	CurAction = Player->GetActionType();
 }
 
-void ULOMAnimPlayer::PlayAttackAnim()
+void ULOMAnimPlayer::PlayAttackAnim(int32 ComboIndex)
 {
 	if(AttackAnimMontage == nullptr) return;
 	Montage_Play(AttackAnimMontage);
+
+	//if (AttackAnimMontage == nullptr) return;
+
+	//FName SectionName = *FString::Printf(TEXT("Combo%d"), ComboIndex); // "Combo1", "Combo2" 등으로 변환
+
+	//if (Montage_IsPlaying(AttackAnimMontage))
+	//{
+	//	Montage_JumpToSection(SectionName, AttackAnimMontage);
+	//}
+	//else
+	//{
+	//	Montage_Play(AttackAnimMontage);
+	//	Montage_JumpToSection(SectionName, AttackAnimMontage);
+	//}
 }
 
 void ULOMAnimPlayer::EquipWeapon()

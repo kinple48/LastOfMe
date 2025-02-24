@@ -22,7 +22,7 @@ public:
 	virtual void NativeUpdateAnimation(float DeltaSeconds) override;
 	
 public:
-	void PlayAttackAnim();
+	void PlayAttackAnim(int32 ComboIndex);
 
 	void EquipWeapon();
 
@@ -68,6 +68,8 @@ protected:
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	EActionState CurAction;
+
+	int ComboAttackIndex = 0;
 
 	UFUNCTION()	
 	void AnimNotify_AttackEnd();
