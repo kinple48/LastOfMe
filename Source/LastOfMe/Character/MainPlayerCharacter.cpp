@@ -286,6 +286,8 @@ void AMainPlayerCharacter::HandleOnMontageNotifyBegin(FName a_nNotifyName, const
 
 void AMainPlayerCharacter::PerformHandSphereTraces()
 {
+	
+
 	FVector Start = GetActorLocation() + GetActorForwardVector() * 100.0f;
 	FVector End = Start + GetActorForwardVector() * 150.0f;
 	float Radius = 50.0f;
@@ -304,19 +306,21 @@ void AMainPlayerCharacter::PerformHandSphereTraces()
 		Params
 	);
 
+
+
 	//if (bHit)
 	//{
 	//	// FireFly FSM 검사
-	//	if (auto fireflyEnemy = Cast<UFireFlyFSM>(zombiEnemy))
+	//	if (auto fireflyEnemy = Cast<UFireFlyFSM>(firefly))
 	//	{
-	//		if (auto FenemyFSM = Cast<UFireFlyFSM>(fireflyEnemy))
+	//		if (auto FenemyFSM = Cast<UFireFlyFSM>(firefly))
 	//		{
 	//			FenemyFSM->OnDamageProcess(1);
 	//		}
 	//	}
 
 	//	// Zombi FSM 검사
-	//	if (auto zombiEnemy = Cast<UEnemyFSM>(zombiEnemy))
+	//	if (auto zombiEnemy = Cast<UEnemyFSM>(enemy))
 	//	{
 	//		if (auto ZBenemyFSM = Cast<UEnemyFSM>(zombiEnemy))
 	//		{
@@ -336,6 +340,8 @@ void AMainPlayerCharacter::AttackAction(const FInputActionValue& inputValue)
 	{
 	case EActionState::UNARMED:
 	{
+		PerformHandSphereTraces();
+
 		Anim->PlayAttackAnim(ComboAttackIndex);
 
 		ComboAttackIndex = 1;
@@ -582,8 +588,6 @@ void AMainPlayerCharacter::OnSheathActionEnd()
 
 		PlayAnimMontage(GetCurrentAction()->GetDrawMontage());
 	}
-
-	
 }
 
 

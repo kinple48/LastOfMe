@@ -22,6 +22,13 @@
 	 BOW     ,
  };
 
+ UENUM(BlueprintType)
+	 enum FistIndex : uint8
+ {
+	LeftFist,
+	RightFist
+ };
+
 UCLASS()
 class LASTOFME_API AMainPlayerCharacter : public APlayerCharacterBase
 {
@@ -141,6 +148,8 @@ public:
 	EActionState  CurActionType = EActionState::UNARMED;
 	EActionState NextActionType = EActionState::UNARMED;
 
+	
+
 	bool bIsAttacking = false; 
 
 	bool bSniperAim = false;
@@ -158,6 +167,8 @@ public:
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	TSubclassOf<class UUserWidget> _CrossHariUIFactory;
+
+
 
 // 잡기 구현 
 public:
@@ -187,6 +198,7 @@ public:
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	class USphereComponent* meleeAttack_L;
+
 
 	
 
