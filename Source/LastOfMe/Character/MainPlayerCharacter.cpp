@@ -25,6 +25,7 @@
 #include "GameFramework/Character.h"
 #include "Animation/AnimNotifies/AnimNotify.h"
 #include "Components/SphereComponent.h"
+#include "Components/SpotLightComponent.h"
 
 
 
@@ -42,6 +43,10 @@ AMainPlayerCharacter::AMainPlayerCharacter()
 
 	MyInputCoponent = CreateDefaultSubobject<ULOMInputComponent>(TEXT("MyInputComponent"));
 	StateComponent  = CreateDefaultSubobject<UStateComponent>   (TEXT("StateComponent"  ));
+
+	FlashLight = CreateDefaultSubobject<USpotLightComponent>(TEXT("FlashLight"));
+	FlashLight->SetupAttachment(springArm);
+	FlashLight->SetRelativeLocation(FVector(180.0f, -60.0f, -30.0f));
 
 
 	meleeAttack_R = CreateDefaultSubobject<USphereComponent>(TEXT("meleeAttack_R"));
@@ -125,6 +130,9 @@ void AMainPlayerCharacter::BeginPlay()
 	{
 		pAnimInst->OnPlayMontageNotifyBegin.AddDynamic(this, &AMainPlayerCharacter::HandleOnMontageNotifyBegin);
 	}
+
+	bIsFlashLight = false; 
+	FlashLight->SetVisibility(false);
 }
 
 void AMainPlayerCharacter::Tick(float DeltaTime)
@@ -160,6 +168,8 @@ void AMainPlayerCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInpu
 
 		EnhancedInputComponent->BindAction(MyInputCoponent->IA_Sniper, ETriggerEvent::Started  , this, &AMainPlayerCharacter::SniperAim);
 		EnhancedInputComponent->BindAction(MyInputCoponent->IA_Sniper, ETriggerEvent::Completed, this, &AMainPlayerCharacter::SniperAim);
+
+		EnhancedInputComponent->BindAction(MyInputCoponent->IA_FlashLight, ETriggerEvent::Started, this, &AMainPlayerCharacter::OnFlashLight);
 
 		// ÁØ¿ìs 
 		EnhancedInputComponent->BindAction(MyInputCoponent->IA_Grab, ETriggerEvent::Started, this, &AMainPlayerCharacter::Grab);
@@ -475,6 +485,12 @@ void AMainPlayerCharacter::OnKnifeKey(const FInputActionValue& inputValue)
 	OnChangeActions(EActionState::KNIFE);
 
 	GEngine->AddOnScreenDebugMessage(-1, 3.0f, FColor::Blue, TEXT("OnKnifeKey"));
+}
+
+void AMainPlayerCharacter::OnFlashLight()
+{
+	FlashLight->SetVisibility(bIsFlashLight);
+	bIsFlashLight = !bIsFlashLight; 
 }
 
 void AMainPlayerCharacter::SniperAim(const struct FInputActionValue& inputValue)

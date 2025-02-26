@@ -101,7 +101,7 @@ protected:
 	void OnBluntKey   (const FInputActionValue& inputValue);
 	void OnKnifeKey   (const FInputActionValue& inputValue);
 
-
+	void OnFlashLight();
 	
 	
 
@@ -156,6 +156,8 @@ public:
 
 	bool bCanCombo = false; 
 
+	bool bIsFlashLight = false; 
+
 	UPROPERTY()
 	class UUserWidget* SniperUI;
 
@@ -199,7 +201,8 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	class USphereComponent* meleeAttack_L;
 
-
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	class USpotLightComponent* FlashLight; 
 	
 
 };

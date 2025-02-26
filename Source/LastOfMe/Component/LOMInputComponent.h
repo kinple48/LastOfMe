@@ -69,7 +69,10 @@ public:
 	UPROPERTY(EditDefaultsOnly, Category = "Input")
 	class UInputAction* IA_F; //FF
 
-UPROPERTY(EditDefaultsOnly, Category = "Input")
+	UPROPERTY(EditDefaultsOnly, Category = "Input")
 	class UInputAction* IA_Sniper; //FF
+
+	UPROPERTY(EditDefaultsOnly, Category = "Input")
+	class UInputAction* IA_FlashLight; 
 };
 
