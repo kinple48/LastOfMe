@@ -204,6 +204,23 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	class USpotLightComponent* FlashLight; 
 	
+	// 스플라인메쉬 
+public:
+	// SplineMesh 에 붙이고 끝 부분에 붙일 데칼을 생성해줌
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Spline")
+	UStaticMesh* DefaultMesh;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Spline")
+	class UMaterialInterface* DefaultMaterial;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Spline")
+	class UDecalComponent* CircleDecal; 
+
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Player", )
+	class USplineComponent* Spline_Path;
+
+
 
 };
 
