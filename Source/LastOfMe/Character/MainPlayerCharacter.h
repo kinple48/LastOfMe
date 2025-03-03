@@ -237,6 +237,10 @@ public:
 
 	void Throw(const FInputActionValue& inputValue);
 
-	class AThrowableBase* beerGlass; 
+	// 일단 이렇게 만들고 바꿔줄거임 ㅜㅜ
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	TSubclassOf<class AThrowableBase> ThrowFactory;
+
+	bool bIsThrow;
 };
 

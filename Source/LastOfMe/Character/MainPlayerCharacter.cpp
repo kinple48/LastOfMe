@@ -30,8 +30,9 @@
 #include "Components/ArrowComponent.h"
 #include "Kismet/KismetMathLibrary.h"
 #include "Components/SkeletalMeshComponent.h"
-
-
+#include "PickupObject/ThrowableBase.h"
+#include "Engine/EngineTypes.h"
+#include "Kismet/KismetSystemLibrary.h"
 
 AMainPlayerCharacter::AMainPlayerCharacter()
 {
@@ -81,10 +82,10 @@ AMainPlayerCharacter::AMainPlayerCharacter()
 	}
 
 	// 스플라인 메쉬 만들기 
-	Spline_Path = CreateDefaultSubobject<USplineComponent>(TEXT("Spline_Path"));
 	ThrowLocation1 = CreateDefaultSubobject<UArrowComponent>(TEXT("ThrowLocation"));
-	ThrowLocation1->SetupAttachment(RootComponent);
-	ThrowLocation1->SetRelativeLocation(FVector(0.0f, 30.0f, 40.0f));
+	ThrowLocation1->SetupAttachment(springArm);
+	ThrowLocation1->SetRelativeLocation(FVector(140.0f, -10.0f, -20.0f));
+	Spline_Path = CreateDefaultSubobject<USplineComponent>(TEXT("Spline_Path"));
 	// 시작하는 포지션 정해주기 
 	Spline_Path->SetupAttachment(ThrowLocation1);
 }
@@ -150,6 +151,8 @@ void AMainPlayerCharacter::BeginPlay()
 void AMainPlayerCharacter::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
+
+	UpdateSplinePath();
 }
 
 void AMainPlayerCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
@@ -171,7 +174,7 @@ void AMainPlayerCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInpu
 		EnhancedInputComponent->BindAction(MyInputCoponent->IA_Attack  , ETriggerEvent::Started  , this, &AMainPlayerCharacter::AttackAction);
 
 
-		EnhancedInputComponent->BindAction(MyInputCoponent->IA_TEST    , ETriggerEvent::Triggered, this, &AMainPlayerCharacter::TEST        );
+		EnhancedInputComponent->BindAction(MyInputCoponent->IA_TEST    , ETriggerEvent::Started, this, &AMainPlayerCharacter::Throw);
 
 		EnhancedInputComponent->BindAction(MyInputCoponent->IA_ChangeWeapon, ETriggerEvent::Started, this, &AMainPlayerCharacter::OnRevolverKey);
 		EnhancedInputComponent->BindAction(MyInputCoponent->IA_ChangeRifle , ETriggerEvent::Started, this, &AMainPlayerCharacter::OnRifleKey   );
@@ -448,6 +451,7 @@ void AMainPlayerCharacter::AttackAction(const FInputActionValue& inputValue)
 void AMainPlayerCharacter::TEST(const FInputActionValue& inputValue)
 {
 	UpdateSplinePath();
+	Throw(inputValue);
 	//MakeNoise(1.0f, this, GetActorLocation(), 1000.f, TEXT("enemysound"));
 	//GEngine->AddOnScreenDebugMessage(-1, 3.0f, FColor::Blue, TEXT("enemysound!!!!!"));
 }
@@ -773,10 +777,6 @@ void AMainPlayerCharacter::UpdateSplinePath()
 	bool isHit = UGameplayStatics::Blueprint_PredictProjectilePath_ByTraceChannel
 				(GetWorld(), OutHit,OutPathPositons, LastPosition, StartPos, LaunchVelocity,
 				true, 30.0f, ECollisionChannel::ECC_WorldStatic, false, IgnoreActors, EDrawDebugTrace::None, 15.0f);
-	
-	//FPredictProjectilePathParams params;
-	//FPredictProjectilePathResult outResult;
-	//UGameplayStatics::PredictProjectilePath(GetWorld(), params, outResult);
 
 
 	for (int i = 0; i < OutPathPositons.Num(); i++)
@@ -800,10 +800,11 @@ void AMainPlayerCharacter::UpdateSplinePath()
 		SplineMeshCoponent->SetStartScale(FVector2D(UKismetSystemLibrary::MakeLiteralFloat(2.0f), UKismetSystemLibrary::MakeLiteralFloat(2.0f)));
 		SplineMeshCoponent->SetEndScale  (FVector2D(UKismetSystemLibrary::MakeLiteralFloat(2.0f), UKismetSystemLibrary::MakeLiteralFloat(2.0f)));
 	
-		const FVector StartPoint   = Spline_Path->GetLocationAtSplinePoint(SplineCount    , ESplineCoordinateSpace::Local);
+		const FVector StartPoint    = Spline_Path->GetLocationAtSplinePoint(SplineCount    , ESplineCoordinateSpace::Local);
 		const FVector StartTanwgent = Spline_Path->GetTangentAtSplinePoint (SplineCount    , ESplineCoordinateSpace::Local);
-		const FVector   EndPoint   = Spline_Path->GetLocationAtSplinePoint(SplineCount + 1, ESplineCoordinateSpace::Local);
-		const FVector   EndTangent = Spline_Path->GetTangentAtSplinePoint (SplineCount + 1, ESplineCoordinateSpace::Local);
+		const FVector   EndPoint    = Spline_Path->GetLocationAtSplinePoint(SplineCount + 1, ESplineCoordinateSpace::Local);
+		const FVector   EndTangent  = Spline_Path->GetTangentAtSplinePoint (SplineCount + 1, ESplineCoordinateSpace::Local);
+		SplineMeshCoponent->SetStartAndEnd(StartPoint,StartTanwgent, EndPoint, EndTangent, true);
 
 		SplineMeshCoponent->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 
@@ -850,12 +851,18 @@ void AMainPlayerCharacter::UpdateSplinePath()
 
 void AMainPlayerCharacter::Throw(const FInputActionValue& inputValue)
 {
+	bIsThrow = !bIsThrow;
+
+
 	// 아직 인풋 바인딩 안함 
 
 	// 소켓 생성해주기 
 	// 다른 상태라면 던지지 못하게 만들기 
 	//FTransform ThrowPosition = this->GetSocketTransform(TEXT(ThrowPosition));
-
 	
+	FTransform throwPosition = ThrowLocation1->GetComponentTransform();
+	GetWorld()->SpawnActor<AThrowableBase>(ThrowFactory, throwPosition);
 
+	UpdateSplinePath();
+	
 }

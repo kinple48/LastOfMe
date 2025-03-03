@@ -30,20 +30,20 @@ AThrowableBase::AThrowableBase()
 	if (TempMesh.Succeeded())
 	{
 		MeshComp->SetStaticMesh(TempMesh.Object);
-		MeshComp->SetRelativeScale3D(FVector(0.09f));
+		MeshComp->SetRelativeScale3D(FVector(0.05f));
 	}
 
 	MovementComp = CreateDefaultSubobject<UProjectileMovementComponent>(TEXT("MovementComp"));
 
 	MovementComp->SetUpdatedComponent(CollisionComp);
 
-	MovementComp->InitialSpeed = 5000.0f;
+	MovementComp->InitialSpeed = 1000.0f;
 
 	MovementComp->MaxSpeed = 5000.0f;
 
 	MovementComp->bShouldBounce = true;
 
-	MovementComp->Bounciness = 0.1f;
+	MovementComp->Bounciness = 0.01f;
 
 
 }
