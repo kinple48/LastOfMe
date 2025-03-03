@@ -26,6 +26,10 @@
 #include "Animation/AnimNotifies/AnimNotify.h"
 #include "Components/SphereComponent.h"
 #include "Components/SpotLightComponent.h"
+#include "Components/SplineComponent.h"
+#include "Components/ArrowComponent.h"
+#include "Kismet/KismetMathLibrary.h"
+#include "Components/SkeletalMeshComponent.h"
 
 
 
@@ -49,19 +53,14 @@ AMainPlayerCharacter::AMainPlayerCharacter()
 	FlashLight->SetRelativeLocation(FVector(180.0f, -60.0f, -30.0f));
 
 
-	meleeAttack_R = CreateDefaultSubobject<USphereComponent>(TEXT("meleeAttack_R"));
-	meleeAttack_R->AttachToComponent(GetMesh(), FAttachmentTransformRules::KeepWorldTransform, "meleeAttack_R");
-	meleeAttack_R->SetCollisionProfileName(TEXT("OverlapAll"));
+	//meleeAttack_R = CreateDefaultSubobject<USphereComponent>(TEXT("meleeAttack_R"));
+	//meleeAttack_R->AttachToComponent(GetMesh(), FAttachmentTransformRules::KeepWorldTransform, "meleeAttack_R");
+	//meleeAttack_R->SetCollisionProfileName(TEXT("OverlapAll"));
 
-	meleeAttack_L = CreateDefaultSubobject<USphereComponent>(TEXT("meleeAttack_L"));
-	meleeAttack_L->AttachToComponent(GetMesh(), FAttachmentTransformRules::KeepWorldTransform, "meleeAttack_L");
-	meleeAttack_L->SetCollisionProfileName(TEXT("OverlapAll"));
+	//meleeAttack_L = CreateDefaultSubobject<USphereComponent>(TEXT("meleeAttack_L"));
+	//meleeAttack_L->AttachToComponent(GetMesh(), FAttachmentTransformRules::KeepWorldTransform, "meleeAttack_L");
+	//meleeAttack_L->SetCollisionProfileName(TEXT("OverlapAll"));
 
-
-
-
-	
-	
 	ConstructorHelpers::FObjectFinder<USkeletalMesh> TempMesh(TEXT("/Script/Engine.SkeletalMesh'/Game/Survival_Character/Meshes/SK_Survival_Character.SK_Survival_Character'"));
 	
 	// 만약 파일읽기가 성공했다면
@@ -81,7 +80,13 @@ AMainPlayerCharacter::AMainPlayerCharacter()
 		GetMesh()->SetAnimInstanceClass(TempAnimInst.Class);
 	}
 
-
+	// 스플라인 메쉬 만들기 
+	Spline_Path = CreateDefaultSubobject<USplineComponent>(TEXT("Spline_Path"));
+	ThrowLocation1 = CreateDefaultSubobject<UArrowComponent>(TEXT("ThrowLocation"));
+	ThrowLocation1->SetupAttachment(RootComponent);
+	ThrowLocation1->SetRelativeLocation(FVector(0.0f, 30.0f, 40.0f));
+	// 시작하는 포지션 정해주기 
+	Spline_Path->SetupAttachment(ThrowLocation1);
 }
 
 void AMainPlayerCharacter::BeginPlay()
@@ -131,8 +136,15 @@ void AMainPlayerCharacter::BeginPlay()
 		pAnimInst->OnPlayMontageNotifyBegin.AddDynamic(this, &AMainPlayerCharacter::HandleOnMontageNotifyBegin);
 	}
 
+
 	bIsFlashLight = false; 
 	FlashLight->SetVisibility(false);
+
+	// 던지는 병도 나중에는 이그노어 해주기 
+	IgnoreActors.Add(GetOwner());
+
+
+
 }
 
 void AMainPlayerCharacter::Tick(float DeltaTime)
@@ -162,18 +174,17 @@ void AMainPlayerCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInpu
 		EnhancedInputComponent->BindAction(MyInputCoponent->IA_TEST    , ETriggerEvent::Triggered, this, &AMainPlayerCharacter::TEST        );
 
 		EnhancedInputComponent->BindAction(MyInputCoponent->IA_ChangeWeapon, ETriggerEvent::Started, this, &AMainPlayerCharacter::OnRevolverKey);
-		EnhancedInputComponent->BindAction(MyInputCoponent->IA_ChangeRifle , ETriggerEvent::Started, this, &AMainPlayerCharacter::OnRifleKey);
-		EnhancedInputComponent->BindAction(MyInputCoponent->IA_ChangeBlunt , ETriggerEvent::Started, this, &AMainPlayerCharacter::OnBluntKey);
-		EnhancedInputComponent->BindAction(MyInputCoponent->IA_ChangeKnife , ETriggerEvent::Started, this, &AMainPlayerCharacter::OnKnifeKey);
+		EnhancedInputComponent->BindAction(MyInputCoponent->IA_ChangeRifle , ETriggerEvent::Started, this, &AMainPlayerCharacter::OnRifleKey   );
+		EnhancedInputComponent->BindAction(MyInputCoponent->IA_ChangeBlunt , ETriggerEvent::Started, this, &AMainPlayerCharacter::OnBluntKey   );
+		EnhancedInputComponent->BindAction(MyInputCoponent->IA_ChangeKnife , ETriggerEvent::Started, this, &AMainPlayerCharacter::OnKnifeKey   );
 
 		EnhancedInputComponent->BindAction(MyInputCoponent->IA_Sniper, ETriggerEvent::Started  , this, &AMainPlayerCharacter::SniperAim);
 		EnhancedInputComponent->BindAction(MyInputCoponent->IA_Sniper, ETriggerEvent::Completed, this, &AMainPlayerCharacter::SniperAim);
 
 		EnhancedInputComponent->BindAction(MyInputCoponent->IA_FlashLight, ETriggerEvent::Started, this, &AMainPlayerCharacter::OnFlashLight);
 
-		// 준우s 
 		EnhancedInputComponent->BindAction(MyInputCoponent->IA_Grab, ETriggerEvent::Started, this, &AMainPlayerCharacter::Grab);
-		EnhancedInputComponent->BindAction(MyInputCoponent->IA_F   , ETriggerEvent::Started, this, &AMainPlayerCharacter::FKey);
+
 	}
 }
 
@@ -436,8 +447,9 @@ void AMainPlayerCharacter::AttackAction(const FInputActionValue& inputValue)
 
 void AMainPlayerCharacter::TEST(const FInputActionValue& inputValue)
 {
-	MakeNoise(1.0f, this, GetActorLocation(), 1000.f, TEXT("enemysound"));
-	GEngine->AddOnScreenDebugMessage(-1, 3.0f, FColor::Blue, TEXT("enemysound!!!!!"));
+	UpdateSplinePath();
+	//MakeNoise(1.0f, this, GetActorLocation(), 1000.f, TEXT("enemysound"));
+	//GEngine->AddOnScreenDebugMessage(-1, 3.0f, FColor::Blue, TEXT("enemysound!!!!!"));
 }
 
 void AMainPlayerCharacter::OnRevolverKey(const FInputActionValue& inputValue)
@@ -725,7 +737,125 @@ void AMainPlayerCharacter::grabend()
 	GetCharacterMovement()->bOrientRotationToMovement = true;
 }
 
-void AMainPlayerCharacter::FKey()
+void AMainPlayerCharacter::UpdateSplinePath()
 {
+	// 사용했으면 지워주기
+	Spline_Path->ClearSplinePoints(true);
+
+	if (Spline_Mesh.Num() > 0)
+	{
+		for (int32 i = 0; i < Spline_Mesh.Num(); i++)
+		{
+			if (Spline_Mesh[i])
+			{
+				// 저장된 배열의 메시 컴포넌트를 삭제하여 계속 지속시킴
+				//Spline_Mesh[i]->DetachFromParent();
+				Spline_Mesh[i]->DestroyComponent(); // 만들었으면 지워주는 
+			}
+		}
+		Spline_Mesh.Empty();
+	}
+	// 필요한 값들
+
+	FHitResult OutHit;
+
+	TArray<FVector> OutPathPositons; 
+	FVector LastPosition;  // 마지막에 떨어지는 곳 ? 떨어지는 곳에 데칼을 그릴려면 사용 
+
+	// 라인 트레이스 시작점 // 
+	FVector StartPos = ThrowLocation1->GetComponentLocation();
+
+	// 라인트레이스 조준점 // 발사체 속도
+	FVector LaunchVelocity = UKismetMathLibrary::GetForwardVector(ThrowLocation1->GetRelativeRotation()) + 1000.0f;
+
+	ThrowDirection = LaunchVelocity;
+	
+	bool isHit = UGameplayStatics::Blueprint_PredictProjectilePath_ByTraceChannel
+				(GetWorld(), OutHit,OutPathPositons, LastPosition, StartPos, LaunchVelocity,
+				true, 30.0f, ECollisionChannel::ECC_WorldStatic, false, IgnoreActors, EDrawDebugTrace::None, 15.0f);
+	
+	//FPredictProjectilePathParams params;
+	//FPredictProjectilePathResult outResult;
+	//UGameplayStatics::PredictProjectilePath(GetWorld(), params, outResult);
+
+
+	for (int i = 0; i < OutPathPositons.Num(); i++)
+	{
+		Spline_Path->AddSplinePointAtIndex(OutPathPositons[i], i, ESplineCoordinateSpace::World);
+	}
+	
+	// 병이 있다면 그리고 장착하고 있다면 
+	for (int SplineCount = 0; SplineCount < (Spline_Path->GetNumberOfSplinePoints()) - 1; SplineCount++)
+	{
+		USplineMeshComponent* SplineMeshCoponent = NewObject<USplineMeshComponent>(this, USplineMeshComponent::StaticClass());
+		SplineMeshCoponent->SetForwardAxis(ESplineMeshAxis::Z);
+		SplineMeshCoponent->SetStaticMesh(DefaultMesh);
+		//정적 움직임// 
+		SplineMeshCoponent->SetMobility(EComponentMobility::Movable);
+		SplineMeshCoponent->CreationMethod = EComponentCreationMethod::UserConstructionScript;
+		// 월드에 등록
+		SplineMeshCoponent->RegisterComponentWithWorld(GetWorld());
+		// 스플라인 컴포넌트에 컴포넌트에 따라 크기 위치를 변경함// 
+		SplineMeshCoponent->AttachToComponent(Spline_Path, FAttachmentTransformRules::KeepRelativeTransform);
+		SplineMeshCoponent->SetStartScale(FVector2D(UKismetSystemLibrary::MakeLiteralFloat(2.0f), UKismetSystemLibrary::MakeLiteralFloat(2.0f)));
+		SplineMeshCoponent->SetEndScale  (FVector2D(UKismetSystemLibrary::MakeLiteralFloat(2.0f), UKismetSystemLibrary::MakeLiteralFloat(2.0f)));
+	
+		const FVector StartPoint   = Spline_Path->GetLocationAtSplinePoint(SplineCount    , ESplineCoordinateSpace::Local);
+		const FVector StartTanwgent = Spline_Path->GetTangentAtSplinePoint (SplineCount    , ESplineCoordinateSpace::Local);
+		const FVector   EndPoint   = Spline_Path->GetLocationAtSplinePoint(SplineCount + 1, ESplineCoordinateSpace::Local);
+		const FVector   EndTangent = Spline_Path->GetTangentAtSplinePoint (SplineCount + 1, ESplineCoordinateSpace::Local);
+
+		SplineMeshCoponent->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+
+		if (DefaultMaterial)
+		{
+			SplineMeshCoponent->SetMaterial(0, DefaultMaterial);
+		}
+		Spline_Mesh.Add(SplineMeshCoponent);
+	}
+
+	//CircleDecal->SetVisibility(true);
+	//CircleDecal->SetWorldLocation(LastPosition); 
+	
+	// 서클 데칼 떨어진 지점에 동그라미를 그려주는 데칼 만들지 말지 
+
+	// 엘스 값 만약에 플레이어 스테이트가 flase 일 경우 그냥 삭제시켜 안 보이게 해준다. 
+
+	
+
+	/*
+	
+	else
+	{
+		Spline_Path->ClearSplinePoints(true);
+		if (Spline_Mesh.Num() > 0)
+		{
+			for (int32 i = 0; i < Spline_Mesh.Num(); i++)
+			{
+				if (Spline_Mesh[i])
+				{
+					// 별다른 행동을 하지 않는 다면 지워준다. 
+					Spline_Mesh[i]->DestroyComponent(); 
+				}
+			}
+			Spline_Mesh.Empty();
+		}
+		// 써클 데칼 그려줄려면 쓰기 
+		// CircleDecal->SetVisibility(false)
+	}
+	
+	
+	*/
 }
 
+void AMainPlayerCharacter::Throw(const FInputActionValue& inputValue)
+{
+	// 아직 인풋 바인딩 안함 
+
+	// 소켓 생성해주기 
+	// 다른 상태라면 던지지 못하게 만들기 
+	//FTransform ThrowPosition = this->GetSocketTransform(TEXT(ThrowPosition));
+
+	
+
+}

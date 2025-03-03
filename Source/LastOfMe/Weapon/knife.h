@@ -26,7 +26,7 @@ public:
 public:
 
 
-	void Attack();
+	virtual void Attack();
 	
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)

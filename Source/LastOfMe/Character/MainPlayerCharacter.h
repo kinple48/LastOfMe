@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "PlayerCharacterBase.h"
+#include "Components/SplineMeshComponent.h"
 #include "MainPlayerCharacter.generated.h"
 
 /**
@@ -23,7 +24,7 @@
  };
 
  UENUM(BlueprintType)
-	 enum FistIndex : uint8
+	 enum class FistIndex : uint8
  {
 	LeftFist,
 	RightFist
@@ -175,7 +176,6 @@ public:
 // 잡기 구현 
 public:
 	void Grab();
-	void FKey();
 	bool cangrab = false;
 	bool cangrab1 = false;
 
@@ -206,6 +206,10 @@ public:
 	
 	// 스플라인메쉬 
 public:
+	// 스플라인메쉬가 시작 되는 곳 나중에 핸드 소켓 만들어서 바꿔주기 
+	UPROPERTY(EditAnywhere,BlueprintReadWrite, Category = "Spline")
+	UArrowComponent* ThrowLocation1; 
+
 	// SplineMesh 에 붙이고 끝 부분에 붙일 데칼을 생성해줌
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Spline")
 	UStaticMesh* DefaultMesh;
@@ -217,10 +221,22 @@ public:
 	class UDecalComponent* CircleDecal; 
 
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Player", )
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Player", meta = (AllowPrivateAccess = "ture"))
 	class USplineComponent* Spline_Path;
 
+	TArray<USplineMeshComponent*> Spline_Mesh; 
 
+	void UpdateSplinePath();
 
+	// 던지는 
+	FVector ThrowDirection;
+
+	//int32 SplineCount = 0;
+
+	TArray<AActor*> IgnoreActors;
+
+	void Throw(const FInputActionValue& inputValue);
+
+	class AThrowableBase* beerGlass; 
 };
 

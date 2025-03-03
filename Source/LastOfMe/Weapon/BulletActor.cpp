@@ -18,7 +18,6 @@ ABulletActor::ABulletActor()
  	// Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
 
-	MeshComp = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("MeshComp"));
 	CollisionComp = CreateDefaultSubobject<USphereComponent>(TEXT("CollisionComp"));
 
 	CollisionComp->SetCollisionProfileName(TEXT("BlockAll"));
@@ -26,6 +25,9 @@ ABulletActor::ABulletActor()
 	CollisionComp->SetSphereRadius(5.0f);
 
 	SetRootComponent(CollisionComp);
+
+	MeshComp = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("MeshComp"));
+	MeshComp->SetupAttachment(CollisionComp);
 
 	ConstructorHelpers::FObjectFinder<UStaticMesh> TempMesh (TEXT("/Script/Engine.StaticMesh'/Game/SSA/Asset/Pistol/Bullet.Bullet'"));
 	
