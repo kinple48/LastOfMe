@@ -80,7 +80,7 @@ public:
 	UFUNCTION()
 	void HandleOnMontageNotifyBegin(FName a_nNotifyName, const FBranchingPointNotifyPayload& a_pBranchingPayLoad);
 
-	void PerformHandSphereTraces();
+	void PerformHandSphereTraces(TArray<FHitResult>& OutHits, FistIndex Fist);
 	
 
 protected:
@@ -208,7 +208,7 @@ public:
 public:
 	// 스플라인메쉬가 시작 되는 곳 나중에 핸드 소켓 만들어서 바꿔주기 
 	UPROPERTY(EditAnywhere,BlueprintReadWrite, Category = "Spline")
-	UArrowComponent* ThrowLocation1; 
+	UArrowComponent* ThrowLocation; 
 
 	// SplineMesh 에 붙이고 끝 부분에 붙일 데칼을 생성해줌
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Spline")

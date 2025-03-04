@@ -82,12 +82,12 @@ AMainPlayerCharacter::AMainPlayerCharacter()
 	}
 
 	// 스플라인 메쉬 만들기 
-	ThrowLocation1 = CreateDefaultSubobject<UArrowComponent>(TEXT("ThrowLocation"));
-	ThrowLocation1->SetupAttachment(springArm);
-	ThrowLocation1->SetRelativeLocation(FVector(140.0f, -10.0f, -20.0f));
+	ThrowLocation = CreateDefaultSubobject<UArrowComponent>(TEXT("ThrowLocation"));
+	ThrowLocation->SetupAttachment(springArm);
+	ThrowLocation->SetRelativeLocation(FVector(140.0f, -10.0f, -20.0f));
 	Spline_Path = CreateDefaultSubobject<USplineComponent>(TEXT("Spline_Path"));
 	// 시작하는 포지션 정해주기 
-	Spline_Path->SetupAttachment(ThrowLocation1);
+	Spline_Path->SetupAttachment(ThrowLocation);
 }
 
 void AMainPlayerCharacter::BeginPlay()
@@ -308,26 +308,60 @@ void AMainPlayerCharacter::HandleOnMontageNotifyBegin(FName a_nNotifyName, const
 	//}
 }
 
-void AMainPlayerCharacter::PerformHandSphereTraces()
+void AMainPlayerCharacter::PerformHandSphereTraces(TArray<FHitResult>& OutHits, FistIndex Fist)
 {
-	FVector Start = GetActorLocation() + GetActorForwardVector() * 100.0f;
+	//FVector Start = GetActorLocation() + GetActorForwardVector() * 100.0f;
+	//FVector End = Start + GetActorForwardVector() * 150.0f;
+	//float Radius = 50.0f;
+
+	//FHitResult HitResult;
+	//FCollisionQueryParams Params;
+	//Params.AddIgnoredActor(this); // 자기 자신 제외
+
+	//bool bHit = GetWorld()->SweepSingleByChannel(
+	//	HitResult,
+	//	Start,
+	//	End,
+	//	FQuat::Identity,
+	//	ECC_Pawn,  // 캐릭터만 충돌 체크
+	//	FCollisionShape::MakeSphere(Radius),
+	//	Params
+	//);
+	USphereComponent* ActiveFist = (Fist == FistIndex::LeftFist) ? meleeAttack_L : meleeAttack_R;
+
+	if (!ActiveFist) return;
+
+	FVector Start = ActiveFist->GetComponentLocation();
 	FVector End = Start + GetActorForwardVector() * 150.0f;
-	float Radius = 50.0f;
+	float Radius = ActiveFist->GetScaledSphereRadius();
 
-	FHitResult HitResult;
+	// 자기 자신 제외
 	FCollisionQueryParams Params;
-	Params.AddIgnoredActor(this); // 자기 자신 제외
+	Params.AddIgnoredActor(this);
 
-	bool bHit = GetWorld()->SweepSingleByChannel(
-		HitResult,
+	// 스윕 검사 수행
+	GetWorld()->SweepMultiByChannel(
+		OutHits,
 		Start,
 		End,
 		FQuat::Identity,
-		ECC_Pawn,  // 캐릭터만 충돌 체크
+		ECC_Pawn,  // Pawn 채널에서만 충돌 확인
 		FCollisionShape::MakeSphere(Radius),
 		Params
 	);
 
+	// 디버그 시각화
+	DrawDebugSphere(GetWorld(), Start, Radius, 12, FColor::Red, false, 2.0f);
+	DrawDebugLine(GetWorld(), Start, End, FColor::Green, false, 2.0f);
+
+	// 디버그 출력
+	for (const auto& Hit : OutHits)
+	{
+		if (Hit.GetActor())
+		{
+			UE_LOG(LogTemp, Log, TEXT("Hit Actor: %s"), *Hit.GetActor()->GetName());
+		}
+	}
 }
 
 void AMainPlayerCharacter::AttackAction(const FInputActionValue& inputValue)
@@ -339,35 +373,61 @@ void AMainPlayerCharacter::AttackAction(const FInputActionValue& inputValue)
 	{
 	case EActionState::UNARMED:
 	{
-		PerformHandSphereTraces();
+		TArray<FHitResult> HitResults;
+		PerformHandSphereTraces(HitResults, FistIndex::RightFist);
 
 		Anim->PlayAttackAnim(ComboAttackIndex);
 
 		ComboAttackIndex = 1;
 
-		FHitResult hitInfo;
-
-		auto hitActor = hitInfo.GetActor();
-		if (!hitActor)
-			return;
-
-		// FireFly FSM 검사
-		if (auto fireflyEnemy = hitActor->GetDefaultSubobjectByName(TEXT("FSM")))
+		for (const auto& Hit : HitResults)
 		{
-			if (auto FenemyFSM = Cast<UFireFlyFSM>(fireflyEnemy))
+			if (auto HitActor = Hit.GetActor())
 			{
-				FenemyFSM->OnDamageProcess(1);
+				UE_LOG(LogTemp, Log, TEXT("Hit Actor: %s"), *HitActor->GetName());
+
+				// FSM 검사 및 데미지 처리
+				if (auto FSMComponent = HitActor->FindComponentByClass<UFireFlyFSM>())
+				{
+					FSMComponent->OnDamageProcess(1);
+					UE_LOG(LogTemp, Log, TEXT("FireFly FSM Damage Applied!"));
+				}
+				else if (auto ZombiFSM = HitActor->FindComponentByClass<UEnemyFSM>())
+				{
+					ZombiFSM->OnDamageProcess(1);
+					UE_LOG(LogTemp, Log, TEXT("Zombi FSM Damage Applied!"));
+				}
 			}
 		}
+		//PerformHandSphereTraces();
 
-		// Zombi FSM 검사
-		if (auto zombiEnemy = hitActor->GetDefaultSubobjectByName(TEXT("FSM")))
-		{
-			if (auto ZBenemyFSM = Cast<UEnemyFSM>(zombiEnemy))
-			{
-				ZBenemyFSM->OnDamageProcess(1);
-			}
-		}
+		//Anim->PlayAttackAnim(ComboAttackIndex);
+
+		//ComboAttackIndex = 1;
+
+		//FHitResult hitInfo;
+
+		//auto hitActor = hitInfo.GetActor();
+		//if (!hitActor)
+		//	return;
+
+		//// FireFly FSM 검사
+		//if (auto fireflyEnemy = hitActor->GetDefaultSubobjectByName(TEXT("FSM")))
+		//{
+		//	if (auto FenemyFSM = Cast<UFireFlyFSM>(fireflyEnemy))
+		//	{
+		//		FenemyFSM->OnDamageProcess(1);
+		//	}
+		//}
+
+		//// Zombi FSM 검사
+		//if (auto zombiEnemy = hitActor->GetDefaultSubobjectByName(TEXT("FSM")))
+		//{
+		//	if (auto ZBenemyFSM = Cast<UEnemyFSM>(zombiEnemy))
+		//	{
+		//		ZBenemyFSM->OnDamageProcess(1);
+		//	}
+		//}
 
 		//if (bCanCombo) // 콤보 입력이 가능하면 다음 공격 실행
 		//{
@@ -751,10 +811,10 @@ void AMainPlayerCharacter::UpdateSplinePath()
 	FVector LastPosition;  // 마지막에 떨어지는 곳 ? 떨어지는 곳에 데칼을 그릴려면 사용 
 
 	// 라인 트레이스 시작점 // 
-	FVector StartPos = ThrowLocation1->GetComponentLocation();
+	FVector StartPos = ThrowLocation->GetComponentLocation();
 
 	// 라인트레이스 조준점 // 발사체 속도
-	FVector LaunchVelocity = UKismetMathLibrary::GetForwardVector(ThrowLocation1->GetRelativeRotation()) + 1000.0f;
+	FVector LaunchVelocity = UKismetMathLibrary::GetForwardVector(ThrowLocation->GetRelativeRotation()) + 1000.0f;
 
 	ThrowDirection = LaunchVelocity;
 	
@@ -832,7 +892,7 @@ void AMainPlayerCharacter::Throw(const FInputActionValue& inputValue)
 
 	if (CurActionType != EActionState::RIFLE && CurActionType != EActionState::KNIFE && CurActionType != EActionState::REVOLVER && CurActionType != EActionState::BLUNT)
 	{
-		FTransform throwPosition = ThrowLocation1->GetComponentTransform();
+		FTransform throwPosition = ThrowLocation->GetComponentTransform();
 		GetWorld()->SpawnActor<AThrowableBase>(ThrowFactory, throwPosition);
 
 		UpdateSplinePath();
