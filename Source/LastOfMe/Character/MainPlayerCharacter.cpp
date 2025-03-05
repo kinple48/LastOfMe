@@ -33,6 +33,7 @@
 #include "PickupObject/ThrowableBase.h"
 #include "Engine/EngineTypes.h"
 #include "Kismet/KismetSystemLibrary.h"
+#include "Components/DecalComponent.h"
 
 AMainPlayerCharacter::AMainPlayerCharacter()
 {
@@ -84,10 +85,12 @@ AMainPlayerCharacter::AMainPlayerCharacter()
 	// 스플라인 메쉬 만들기 
 	ThrowLocation = CreateDefaultSubobject<UArrowComponent>(TEXT("ThrowLocation"));
 	ThrowLocation->SetupAttachment(springArm);
-	ThrowLocation->SetRelativeLocation(FVector(140.0f, -10.0f, -20.0f));
+	ThrowLocation->SetRelativeLocation(FVector(10.0f, 60.0f, 50.0f));
 	Spline_Path = CreateDefaultSubobject<USplineComponent>(TEXT("Spline_Path"));
 	// 시작하는 포지션 정해주기 
 	Spline_Path->SetupAttachment(ThrowLocation);
+
+	CircleDecal = CreateDefaultSubobject<UDecalComponent>(TEXT("CircleDecal"));
 }
 
 void AMainPlayerCharacter::BeginPlay()
@@ -310,23 +313,7 @@ void AMainPlayerCharacter::HandleOnMontageNotifyBegin(FName a_nNotifyName, const
 
 void AMainPlayerCharacter::PerformHandSphereTraces(TArray<FHitResult>& OutHits, FistIndex Fist)
 {
-	//FVector Start = GetActorLocation() + GetActorForwardVector() * 100.0f;
-	//FVector End = Start + GetActorForwardVector() * 150.0f;
-	//float Radius = 50.0f;
 
-	//FHitResult HitResult;
-	//FCollisionQueryParams Params;
-	//Params.AddIgnoredActor(this); // 자기 자신 제외
-
-	//bool bHit = GetWorld()->SweepSingleByChannel(
-	//	HitResult,
-	//	Start,
-	//	End,
-	//	FQuat::Identity,
-	//	ECC_Pawn,  // 캐릭터만 충돌 체크
-	//	FCollisionShape::MakeSphere(Radius),
-	//	Params
-	//);
 	USphereComponent* ActiveFist = (Fist == FistIndex::LeftFist) ? meleeAttack_L : meleeAttack_R;
 
 	if (!ActiveFist) return;
@@ -399,48 +386,6 @@ void AMainPlayerCharacter::AttackAction(const FInputActionValue& inputValue)
 				}
 			}
 		}
-		//PerformHandSphereTraces();
-
-		//Anim->PlayAttackAnim(ComboAttackIndex);
-
-		//ComboAttackIndex = 1;
-
-		//FHitResult hitInfo;
-
-		//auto hitActor = hitInfo.GetActor();
-		//if (!hitActor)
-		//	return;
-
-		//// FireFly FSM 검사
-		//if (auto fireflyEnemy = hitActor->GetDefaultSubobjectByName(TEXT("FSM")))
-		//{
-		//	if (auto FenemyFSM = Cast<UFireFlyFSM>(fireflyEnemy))
-		//	{
-		//		FenemyFSM->OnDamageProcess(1);
-		//	}
-		//}
-
-		//// Zombi FSM 검사
-		//if (auto zombiEnemy = hitActor->GetDefaultSubobjectByName(TEXT("FSM")))
-		//{
-		//	if (auto ZBenemyFSM = Cast<UEnemyFSM>(zombiEnemy))
-		//	{
-		//		ZBenemyFSM->OnDamageProcess(1);
-		//	}
-		//}
-
-		//if (bCanCombo) // 콤보 입력이 가능하면 다음 공격 실행
-		//{
-		//	ComboAttackIndex++;
-		//}
-		//else // 첫 공격이면 콤보 시작
-		//{
-		//	ComboAttackIndex = 1;
-		//}
-
-		//bCanCombo = false; // 다시 입력 받을 때까지 비활성화
-		////bIsAttacking = true;
-		//Anim->PlayAttackAnim(ComboAttackIndex); // 현재 콤보 인덱스로 애니메이션 실행
 	}
 		break;
 	case EActionState::REVOLVER:
@@ -666,7 +611,6 @@ void AMainPlayerCharacter::OnSheathActionEnd()
 	}
 }
 
-
 // 잡기 구현
 void AMainPlayerCharacter::Grab()
 {
@@ -843,12 +787,12 @@ void AMainPlayerCharacter::UpdateSplinePath()
 			// 스플라인 컴포넌트에 컴포넌트에 따라 크기 위치를 변경함// 
 			SplineMeshCoponent->AttachToComponent(Spline_Path, FAttachmentTransformRules::KeepRelativeTransform);
 			SplineMeshCoponent->SetStartScale(FVector2D(UKismetSystemLibrary::MakeLiteralFloat(2.0f), UKismetSystemLibrary::MakeLiteralFloat(2.0f)));
-			SplineMeshCoponent->SetEndScale(FVector2D(UKismetSystemLibrary::MakeLiteralFloat(2.0f), UKismetSystemLibrary::MakeLiteralFloat(2.0f)));
+			SplineMeshCoponent->SetEndScale  (FVector2D(UKismetSystemLibrary::MakeLiteralFloat(2.0f), UKismetSystemLibrary::MakeLiteralFloat(2.0f)));
 
-			const FVector StartPoint = Spline_Path->GetLocationAtSplinePoint(SplineCount, ESplineCoordinateSpace::Local);
-			const FVector StartTanwgent = Spline_Path->GetTangentAtSplinePoint(SplineCount, ESplineCoordinateSpace::Local);
-			const FVector   EndPoint = Spline_Path->GetLocationAtSplinePoint(SplineCount + 1, ESplineCoordinateSpace::Local);
-			const FVector   EndTangent = Spline_Path->GetTangentAtSplinePoint(SplineCount + 1, ESplineCoordinateSpace::Local);
+			const FVector StartPoint    = Spline_Path->GetLocationAtSplinePoint(SplineCount    , ESplineCoordinateSpace::Local);
+			const FVector StartTanwgent = Spline_Path->GetTangentAtSplinePoint (SplineCount    , ESplineCoordinateSpace::Local);
+			const FVector   EndPoint    = Spline_Path->GetLocationAtSplinePoint(SplineCount + 1, ESplineCoordinateSpace::Local);
+			const FVector   EndTangent  = Spline_Path->GetTangentAtSplinePoint (SplineCount + 1, ESplineCoordinateSpace::Local);
 			SplineMeshCoponent->SetStartAndEnd(StartPoint, StartTanwgent, EndPoint, EndTangent, true);
 
 			SplineMeshCoponent->SetCollisionEnabled(ECollisionEnabled::NoCollision);
@@ -881,8 +825,8 @@ void AMainPlayerCharacter::UpdateSplinePath()
 			}
 			Spline_Mesh.Empty();
 		}
-		// 써클 데칼 그려줄려면 쓰기 
-		// CircleDecal->SetVisibility(false)
+		//써클 데칼 그려줄려면 쓰기
+		//CircleDecal->SetVisibility(false);
 	}
 }
 
@@ -901,8 +845,4 @@ void AMainPlayerCharacter::Throw(const FInputActionValue& inputValue)
 
 	// 소켓 생성해주기 
 	// 다른 상태라면 던지지 못하게 만들기 
-	//FTransform ThrowPosition = this->GetSocketTransform(TEXT(ThrowPosition));
-	
-	
-	
 }

@@ -220,7 +220,6 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Spline")
 	class UDecalComponent* CircleDecal; 
 
-
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Player", meta = (AllowPrivateAccess = "ture"))
 	class USplineComponent* Spline_Path;
 
