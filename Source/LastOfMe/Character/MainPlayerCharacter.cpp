@@ -90,7 +90,7 @@ AMainPlayerCharacter::AMainPlayerCharacter()
 	// 시작하는 포지션 정해주기 
 	Spline_Path->SetupAttachment(ThrowLocation);
 
-	CircleDecal = CreateDefaultSubobject<UDecalComponent>(TEXT("CircleDecal"));
+	//CircleDecal = CreateDefaultSubobject<UDecalComponent>(TEXT("CircleDecal"));
 }
 
 void AMainPlayerCharacter::BeginPlay()
@@ -239,7 +239,6 @@ void AMainPlayerCharacter::SlowMove(const FInputActionValue& inputValue)
 		if (StateComponent->WalkSpeed)
 		{
 			MakeNoise(1.0f, this, GetActorLocation(), 1000.f, TEXT("enemysound"));
-			GEngine->AddOnScreenDebugMessage(-1, 3.0f, FColor::Blue, TEXT("WalkSpeed"));
 		}
 	}
 	else
@@ -248,7 +247,6 @@ void AMainPlayerCharacter::SlowMove(const FInputActionValue& inputValue)
 		if(StateComponent->RunSpeed)
 		{
 			MakeNoise(1.0f, this, GetActorLocation(), 1000.f, TEXT("enemysound"));
-			GEngine->AddOnScreenDebugMessage(-1, 3.0f, FColor::Blue, TEXT("RunSpeed"));
 		}
 	}
 }
@@ -263,7 +261,6 @@ void AMainPlayerCharacter::SprintStart()
 	if (StateComponent->SprintSpeed)
 	{
 		MakeNoise(1.0f, this, GetActorLocation(), 1000.f, TEXT("enemysound"));
-		GEngine->AddOnScreenDebugMessage(-1, 3.0f, FColor::Blue, TEXT("SprintSpeed"));
 	}
 }
 
@@ -446,8 +443,6 @@ void AMainPlayerCharacter::OnRevolverKey(const FInputActionValue& inputValue)
 
 	//auto anim = Cast<ULOMAnimPlayer>(GetMesh()->GetAnimInstance());
 	//anim->EquipWeapon();
-
-	GEngine->AddOnScreenDebugMessage(-1, 3.0f, FColor::Blue, TEXT("OnRevolverKey"));
 }
 
 void AMainPlayerCharacter::OnRifleKey(const FInputActionValue& inputValue)
