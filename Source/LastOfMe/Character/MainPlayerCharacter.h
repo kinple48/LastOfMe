@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "PlayerCharacterBase.h"
+#include "Components/SplineMeshComponent.h"
 #include "MainPlayerCharacter.generated.h"
 
 /**
@@ -20,6 +21,13 @@
 	 BLUNT   ,
 	 KNIFE   ,
 	 BOW     ,
+ };
+
+ UENUM(BlueprintType)
+	 enum class FistIndex : uint8
+ {
+	LeftFist,
+	RightFist
  };
 
 UCLASS()
@@ -72,7 +80,7 @@ public:
 	UFUNCTION()
 	void HandleOnMontageNotifyBegin(FName a_nNotifyName, const FBranchingPointNotifyPayload& a_pBranchingPayLoad);
 
-	void PerformHandSphereTraces();
+	void PerformHandSphereTraces(TArray<FHitResult>& OutHits, FistIndex Fist);
 	
 
 protected:
@@ -94,7 +102,7 @@ protected:
 	void OnBluntKey   (const FInputActionValue& inputValue);
 	void OnKnifeKey   (const FInputActionValue& inputValue);
 
-
+	void OnFlashLight();
 	
 	
 
@@ -141,11 +149,15 @@ public:
 	EActionState  CurActionType = EActionState::UNARMED;
 	EActionState NextActionType = EActionState::UNARMED;
 
+	
+
 	bool bIsAttacking = false; 
 
 	bool bSniperAim = false;
 
 	bool bCanCombo = false; 
+
+	bool bIsFlashLight = false; 
 
 	UPROPERTY()
 	class UUserWidget* SniperUI;
@@ -159,10 +171,11 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	TSubclassOf<class UUserWidget> _CrossHariUIFactory;
 
+
+
 // 잡기 구현 
 public:
 	void Grab();
-	void FKey();
 	bool cangrab = false;
 	bool cangrab1 = false;
 
@@ -188,7 +201,45 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	class USphereComponent* meleeAttack_L;
 
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	class USpotLightComponent* FlashLight; 
 	
+	// 스플라인메쉬 
+public:
+	// 스플라인메쉬가 시작 되는 곳 나중에 핸드 소켓 만들어서 바꿔주기 
+	UPROPERTY(EditAnywhere,BlueprintReadWrite, Category = "Spline")
+	UArrowComponent* ThrowLocation; 
 
+	// SplineMesh 에 붙이고 끝 부분에 붙일 데칼을 생성해줌
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Spline")
+	UStaticMesh* DefaultMesh;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Spline")
+	class UMaterialInterface* DefaultMaterial;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Spline")
+	class UDecalComponent* CircleDecal; 
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Player", meta = (AllowPrivateAccess = "ture"))
+	class USplineComponent* Spline_Path;
+
+	TArray<USplineMeshComponent*> Spline_Mesh; 
+
+	void UpdateSplinePath();
+
+	// 던지는 
+	FVector ThrowDirection;
+
+	//int32 SplineCount = 0;
+
+	TArray<AActor*> IgnoreActors;
+
+	void Throw(const FInputActionValue& inputValue);
+
+	// 일단 이렇게 만들고 바꿔줄거임 ㅜㅜ
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	TSubclassOf<class AThrowableBase> ThrowFactory;
+
+	bool bIsThrow;
 };
 
