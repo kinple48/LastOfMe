@@ -19,6 +19,11 @@
 #include "Perception/AIPerceptionComponent.h"
 #include "AIController.h"
 #include "Components/CapsuleComponent.h"
+#include "LevelSequence.h"
+#include "LevelSequencePlayer.h"
+#include "LevelSequenceActor.h"
+#include "MovieSceneSequencePlaybackSettings.h"
+#include "MovieSceneSequencePlayer.h"
 
 UEnemyFSM::UEnemyFSM()
 {
@@ -47,8 +52,8 @@ void UEnemyFSM::TickComponent(float DeltaTime, ELevelTick TickType, FActorCompon
 {
 	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
 
-	//FString logMsg = UEnum::GetValueAsString(mState);
-	//GEngine->AddOnScreenDebugMessage(0, 1.0f, FColor::Red, logMsg);
+	FString logMsg = UEnum::GetValueAsString(mState);
+	GEngine->AddOnScreenDebugMessage(0, 1.0f, FColor::Red, logMsg);
 
 	switch (mState)
 	{
@@ -57,7 +62,7 @@ void UEnemyFSM::TickComponent(float DeltaTime, ELevelTick TickType, FActorCompon
 	case EEnemyState::Attack: { AttackState(); } break;
 	case EEnemyState::Damage: { DamageState(); } break;
 	case EEnemyState::Die: { DieState(); } break;
-	case EEnemyState::Bite: { BiteState(); } break;
+	//case EEnemyState::Bite: { BiteState(); } break;
 	case EEnemyState::Patrol: { PatrolState(); } break;
 	case EEnemyState::Grab: { GrabState(); } break;
 	}
@@ -131,6 +136,12 @@ void UEnemyFSM::AttackState()
 
 
 	CurrentTime += GetWorld()->GetDeltaSeconds();
+	/*CT += GetWorld()->GetDeltaSeconds();
+	if (CT >= BT)
+	{
+		mState = EEnemyState::Bite;
+	}*/
+
 	if (CurrentTime >= attackDelayTime)
 	{
 		CurrentTime = 0.f;
@@ -163,9 +174,23 @@ void UEnemyFSM::DieState()
 	me->GetCapsuleComponent()->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 }
 
-void UEnemyFSM::BiteState()
-{
-}
+//void UEnemyFSM::BiteState()
+//{
+//	me->isBiting = true;
+//	TArray<AActor*> FoundActors;
+//	UGameplayStatics::GetAllActorsOfClass(GetWorld(), AEnemy::StaticClass(), FoundActors);
+//	for (AActor* Actor : FoundActors)
+//	{
+//		AEnemy* Zombie = Cast<AEnemy>(Actor);
+//		if (Zombie && Zombie->isBiting)
+//		{
+//			GEngine->AddOnScreenDebugMessage(0, 1.0f, FColor::Red, TEXT("find zombie"));
+//			FVector Location = Zombie->GetActorLocation();
+//			FRotator Rotation = Zombie->GetActorRotation();
+//			PlaySequence(Zombie);
+//		}
+//	}
+//}
 
 void UEnemyFSM::PatrolState()
 {
@@ -221,3 +246,28 @@ void UEnemyFSM::OnDamageProcess(int32 damage)
 		me->PlayAnimMontage(Anim->EnemyMontage, 1.f, TEXT("Die"));
 	}
 }
+
+//void UEnemyFSM::PlaySequence(AEnemy* Zombie)
+//{
+//
+//	ULevelSequence* Sequence = LoadObject<ULevelSequence>(nullptr, TEXT("/Script/LevelSequence.LevelSequence'/Game/Cinematics/Sequences/Sequence/NewLevelSequence.NewLevelSequence'"));
+//
+//	if (Sequence)
+//	{
+//		GEngine->AddOnScreenDebugMessage(0, 1.0f, FColor::Red, TEXT("find sequence"));
+//		FMovieSceneSequencePlaybackSettings PlaybackSettings;
+//		ALevelSequenceActor* LevelSequenceActor;
+//		ULevelSequencePlayer* SequencePlayer = ULevelSequencePlayer::CreateLevelSequencePlayer(GetWorld(), Sequence, PlaybackSettings, LevelSequenceActor);
+//
+//		if (SequencePlayer)
+//		{
+//			SequencePlayer->Play();
+//			/*Asq_runner* SpawnedActor = GetWorld()->SpawnActor<Asq_runner>(enemyfactory, Location, Rotation);
+//			if (SpawnedActor)
+//			{
+//				GEngine->AddOnScreenDebugMessage(0, 1.0f, FColor::Red, TEXT("spawn zombie"));
+//				PlaySequence(Zombie);
+//			}*/
+//		}
+//	}
+//}

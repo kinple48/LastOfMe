@@ -50,5 +50,7 @@ public:
 	UFUNCTION()
 	void grabendoverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex);
 
+	UPROPERTY(EditAnywhere,BlueprintReadWrite)
+	bool isBiting = false;
 
 };

@@ -5,6 +5,7 @@
 #include "CoreMinimal.h"
 #include "Components/ActorComponent.h"
 #include "../Character/MainPlayerCharacter.h"
+#include "sq_runner.h"
 #include "EnemyFSM.generated.h"
 
 UENUM(BlueprintType)
@@ -76,6 +77,9 @@ public:
 	float CurrentTime = 0.f;
 	float IdleTime = 2.0f;
 
+	float CT = 0.f;
+	float BT = 5.f;
+
 	UPROPERTY()
 	class AAIsight* ai;
 	FVector randomPos;
@@ -88,4 +92,10 @@ public:
 	int32 hp = 4;
 
 	void OnDamageProcess(int32 damage);
+
+	/*UPROPERTY(EditAnywhere,BlueprintReadWrite)
+	TSubclassOf<Asq_runner> enemyfactory;
+
+	UFUNCTION()
+	void PlaySequence(AEnemy* Zombie);*/
 };

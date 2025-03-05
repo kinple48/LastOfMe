@@ -1,6 +1,7 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
 
+
 #include "Enemy.h"
 #include "EnemyFSM.h"
 #include "Components/SphereComponent.h"
@@ -8,6 +9,7 @@
 #include "../Character/MainPlayerCharacter.h"
 #include "EnemyAnimInstance.h"
 #include "AIsight.h"
+
 
 // Sets default values
 AEnemy::AEnemy()
