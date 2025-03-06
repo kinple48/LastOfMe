@@ -59,7 +59,7 @@ void AFireFlyController::PerceptionUpdated(const TArray<AActor*>& UpdatedActors)
 			{
 				if (!isDead)
 				{
-					GEngine->AddOnScreenDebugMessage(-1, 3.0f, FColor::Black, TEXT("hello"));
+					//GEngine->AddOnScreenDebugMessage(-1, 3.0f, FColor::Black, TEXT("hello"));
 					class AFireFly* firefly = Cast<AFireFly>(GetCharacter());
 					firefly->FindComponentByClass<UFireFlyFSM>()->mState = EFireFlyState::Move;
 					firefly->FindComponentByClass<UFireFlyFSM>()->Anim->AnimState = EFireFlyState::Move;

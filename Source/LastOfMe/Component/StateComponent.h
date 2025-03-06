@@ -78,10 +78,10 @@ public:
 	int32 Damage;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "State")
-	float MaxHP;
+	float MaxHP = 4;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "State")
-	float CurHP;
+	float CurHP = 0;
 
 
 		

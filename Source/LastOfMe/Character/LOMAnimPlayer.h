@@ -40,6 +40,12 @@ public:
 	UPROPERTY(EditDefaultsOnly, Category = LOMAnimPlayer)
 	class UAnimMontage* GrabMontage; 
 
+	UPROPERTY(EditDefaultsOnly, Category = LOMAnimPlayer)
+	class UAnimMontage* HitMontage;
+
+	UPROPERTY(EditDefaultsOnly, Category = LOMAnimPlayer)
+	class UAnimMontage* DeathMontage; 
+
 	UFUNCTION()
 	void AnimNotify_grabend();
 

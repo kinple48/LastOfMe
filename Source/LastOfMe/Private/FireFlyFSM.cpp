@@ -271,12 +271,12 @@ void UFireFlyFSM::GunShot()
 	{
 		if (target)
 		{
-			GEngine->AddOnScreenDebugMessage(-1, 3.0f, FColor::Black, TEXT("On Hit"));
+			//GEngine->AddOnScreenDebugMessage(-1, 3.0f, FColor::Black, TEXT("On Hit"));
 		}
 	}
 
 	FHitResult hitResult;
-	DrawDebugLineTraceSingle(GetWorld(), startPos, endPos, EDrawDebugTrace::ForDuration, true, hitResult, FLinearColor::Green, FLinearColor::Red, 3.f);
+	//DrawDebugLineTraceSingle(GetWorld(), startPos, endPos, EDrawDebugTrace::ForDuration, true, hitResult, FLinearColor::Green, FLinearColor::Red, 3.f);
 }
 
 void UFireFlyFSM::Punch_R_Start()

@@ -421,16 +421,12 @@ void AMainPlayerCharacter::AttackAction(const FInputActionValue& inputValue)
 		default:
 		break;
 	}*/
-
-	
 }
 
 void AMainPlayerCharacter::TEST(const FInputActionValue& inputValue)
 {
 	UpdateSplinePath();
 	Throw(inputValue);
-	//MakeNoise(1.0f, this, GetActorLocation(), 1000.f, TEXT("enemysound"));
-	//GEngine->AddOnScreenDebugMessage(-1, 3.0f, FColor::Blue, TEXT("enemysound!!!!!"));
 }
 
 void AMainPlayerCharacter::OnRevolverKey(const FInputActionValue& inputValue)
@@ -439,10 +435,6 @@ void AMainPlayerCharacter::OnRevolverKey(const FInputActionValue& inputValue)
 
 
 	OnChangeActions(EActionState::REVOLVER);
-	// CurActionType = EActionState::BLUNT;
-
-	//auto anim = Cast<ULOMAnimPlayer>(GetMesh()->GetAnimInstance());
-	//anim->EquipWeapon();
 }
 
 void AMainPlayerCharacter::OnRifleKey(const FInputActionValue& inputValue)
@@ -451,12 +443,7 @@ void AMainPlayerCharacter::OnRifleKey(const FInputActionValue& inputValue)
 
 
 	OnChangeActions(EActionState::RIFLE);
-	// CurActionType = EActionState::BLUNT;
 
-	//auto anim = Cast<ULOMAnimPlayer>(GetMesh()->GetAnimInstance());
-	//anim->EquipWeapon();
-
-	GEngine->AddOnScreenDebugMessage(-1, 3.0f, FColor::Blue, TEXT("RIFLE"));
 }
 
 void AMainPlayerCharacter::OnBluntKey(const FInputActionValue& inputValue)
@@ -464,8 +451,7 @@ void AMainPlayerCharacter::OnBluntKey(const FInputActionValue& inputValue)
 	FString string = inputValue.ToString();
 
 	OnChangeActions(EActionState::BLUNT);
-	
-	GEngine->AddOnScreenDebugMessage(-1, 3.0f, FColor::Blue, TEXT("BLUNT"));
+
 }
 
 void AMainPlayerCharacter::OnKnifeKey(const FInputActionValue& inputValue)
@@ -474,8 +460,6 @@ void AMainPlayerCharacter::OnKnifeKey(const FInputActionValue& inputValue)
 
 
 	OnChangeActions(EActionState::KNIFE);
-
-	GEngine->AddOnScreenDebugMessage(-1, 3.0f, FColor::Blue, TEXT("OnKnifeKey"));
 }
 
 void AMainPlayerCharacter::OnFlashLight()
@@ -499,9 +483,14 @@ void AMainPlayerCharacter::SniperAim(const struct FInputActionValue& inputValue)
 		else
 		{
 			SniperUI->RemoveFromParent();
+			_CrossHariUI->RemoveFromParent();
 			playerCam->SetFieldOfView(90.0f);
 			_CrossHariUI->AddToViewport();
 		}
+	}
+	else if (CurActionType == EActionState::BLUNT || CurActionType == EActionState::UNARMED)
+	{
+		_CrossHariUI->RemoveFromParent();
 	}
 
 }
@@ -617,7 +606,6 @@ void AMainPlayerCharacter::Grab()
 		GetCharacterMovement()->DisableMovement();
 		this->bUseControllerRotationYaw = false;
 		GetCharacterMovement()->bOrientRotationToMovement = false;
-		GEngine->AddOnScreenDebugMessage(-1, 3.0f, FColor::Blue, TEXT("grab"));
 		FString sectionName = FString::Printf(TEXT("grab"));
 		this->PlayAnimMontage(Anim->GrabMontage, 1.f, FName(*sectionName));
 		TArray<AActor*> FoundActors;
@@ -669,7 +657,6 @@ void AMainPlayerCharacter::Grab()
 		GetCharacterMovement()->DisableMovement();
 		this->bUseControllerRotationYaw = false;
 		GetCharacterMovement()->bOrientRotationToMovement = false;
-		GEngine->AddOnScreenDebugMessage(-1, 3.0f, FColor::Blue, TEXT("grab"));
 		FString sectionName = FString::Printf(TEXT("grab"));
 		this->PlayAnimMontage(Anim->GrabMontage, 1.f, FName(*sectionName));
 		TArray<AActor*> foundactors;
