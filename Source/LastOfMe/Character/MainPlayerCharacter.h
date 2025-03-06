@@ -155,6 +155,8 @@ public:
 
 	bool bSniperAim = false;
 
+	bool bRevolverAnim = false; 
+
 	bool bCanCombo = false; 
 
 	bool bIsFlashLight = false; 
